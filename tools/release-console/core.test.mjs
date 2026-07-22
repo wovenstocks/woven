@@ -6,6 +6,7 @@ import {
   isTransactionExpired,
   manifestHashPayload,
   normalizeAndVerifyManifest,
+  quantityToDecimal,
   sha256Json,
   transactionSequenceFailure,
   transactionIntentPayload,
@@ -128,6 +129,16 @@ describe("release-console manifest validation", () => {
 })
 
 describe("release-console transaction and receipt records", () => {
+  it("normalizes lossless wallet hex quantities and rejects ambiguous inputs", () => {
+    expect(quantityToDecimal("0x0")).toBe("0")
+    expect(quantityToDecimal("0x04")).toBe("4")
+    expect(quantityToDecimal("0x00000038")).toBe("56")
+
+    for (const invalid of ["0x", "4", "0x-1", "0xgg", 4, -1, null, undefined]) {
+      expect(() => quantityToDecimal(invalid)).toThrow("is not a hexadecimal quantity")
+    }
+  })
+
   it("enforces manifest order and stops after any earlier failed receipt", () => {
     const transactions = [{ id: "first" }, { id: "second" }]
     expect(transactionSequenceFailure(transactions, new Map(), "first")).toBeNull()
