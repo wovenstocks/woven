@@ -1,8 +1,31 @@
-import { Menu, X } from "lucide-react"
+import { Menu, X as CloseIcon } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import { siGithub, siX } from "simple-icons"
 import { Brand } from "./Brand"
 
 const focusableSelector = "button:not([disabled]), a[href]"
+const socialLinks = [
+  { label: "Woven on X", href: "https://x.com/wovenstocks", icon: siX },
+  { label: "Woven on GitHub", href: "https://github.com/wovenstocks/woven", icon: siGithub },
+]
+
+function HeaderSocialLinks({ mobile = false }) {
+  return (
+    <div
+      className={mobile ? "mobile-nav__socials" : "header-social-links"}
+      aria-label="Woven social links"
+    >
+      {socialLinks.map(({ label, href, icon }) => (
+        <a key={href} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d={icon.path} />
+          </svg>
+          {mobile && <span>{label.replace("Woven on ", "")}</span>}
+        </a>
+      ))}
+    </div>
+  )
+}
 
 export function SiteHeader({ onNavigate }) {
   const [open, setOpen] = useState(false)
@@ -92,13 +115,16 @@ export function SiteHeader({ onNavigate }) {
           $WOVEN
         </button>
       </nav>
-      <button
-        className="button button--paper header-launch"
-        type="button"
-        onClick={() => navigate("app")}
-      >
-        Explore baskets
-      </button>
+      <div className="header-actions">
+        <HeaderSocialLinks />
+        <button
+          className="button button--paper header-launch"
+          type="button"
+          onClick={() => navigate("app")}
+        >
+          Explore baskets
+        </button>
+      </div>
       <button
         ref={menuButtonRef}
         className="menu-button"
@@ -108,7 +134,7 @@ export function SiteHeader({ onNavigate }) {
         aria-controls="woven-mobile-navigation"
         onClick={() => setOpen((value) => !value)}
       >
-        {open ? <X size={23} aria-hidden="true" /> : <Menu size={23} aria-hidden="true" />}
+        {open ? <CloseIcon size={23} aria-hidden="true" /> : <Menu size={23} aria-hidden="true" />}
       </button>
       {open && (
         <nav
@@ -132,6 +158,7 @@ export function SiteHeader({ onNavigate }) {
           <button type="button" onClick={() => navigate("app")}>
             Explore baskets
           </button>
+          <HeaderSocialLinks mobile />
         </nav>
       )}
     </header>

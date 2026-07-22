@@ -1,5 +1,5 @@
 {
-  "name": "Woven Stocks",
+  "name": "Woven",
   "short_name": "Woven",
   "description": "Create, buy and redeem transparent baskets of approved bStock tokens on BNB Chain.",
   "id": "/",
@@ -11,9 +11,15 @@
   "categories": ["finance", "business"],
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

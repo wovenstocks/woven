@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ArrowDown, ArrowRight, Blocks, Flame, RefreshCcw, Sparkles } from "lucide-react"
 import { siGithub } from "simple-icons"
 import { Brand, StockBadge } from "../components/Brand"
@@ -69,10 +69,6 @@ export function LandingPage({ onNavigate }) {
   const [activeBasketId, setActiveBasketId] = useState(marketedBaskets[0].id)
   const activeBasket =
     marketedBaskets.find((basket) => basket.id === activeBasketId) || marketedBaskets[0]
-
-  useEffect(() => {
-    document.title = "Woven Stocks · Built from many. Held as one."
-  }, [])
 
   const scrollToBaskets = () => {
     const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -414,21 +410,8 @@ export function LandingPage({ onNavigate }) {
                 GitHub
               </a>
             </div>
-            <button
-              type="button"
-              onClick={() => document.getElementById("risk-and-eligibility")?.scrollIntoView()}
-            >
-              Risk & eligibility
-            </button>
-            <a href="/third-party-licenses.txt">Licenses</a>
           </div>
         </div>
-        <p className="footer-disclosure" id="risk-and-eligibility">
-          Woven basket tokens are designed to redeem in kind for their listed bStock constituents
-          when constituent transfer rules permit. They are not ETFs or direct shares in the
-          referenced companies. Woven is independent from Binance and the referenced issuers.
-          Eligibility, availability and issuer terms apply.
-        </p>
         <div className="footer-bottom">
           <span>© 2026 Woven Stocks</span>
           <span>BNB Chain</span>

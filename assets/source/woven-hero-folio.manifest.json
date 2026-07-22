@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generator": {
     "path": "scripts/generate-image-assets.mjs",
-    "sha256": "9e3e512d0b7b914cea9e8bf0b0dd21f2a2f0bee97ba7ea5c64b15fe70723b533"
+    "sha256": "7e52d1142f3e1dfc5086eb4c7d4dcd806abab96dc630cd0014797a7a13f26aba"
   },
   "source": {
     "path": "assets/source/woven-hero-folio.png",
@@ -53,11 +53,6 @@
       "path": "public/woven-hero-folio-1586.avif",
       "sha256": "82ce8186606f5af9017b17eb7ba782d43bc36469e7b466d953e7429bae63528b",
       "bytes": 127325
-    },
-    {
-      "path": "public/social-card.jpg",
-      "sha256": "eda02c6befad80d9784e3b3b79f7ffc127f5d94c0ae2f6e9769ebff5634df28e",
-      "bytes": 127228
     }
   ]
 }

@@ -58,7 +58,6 @@ if (checkOnly) {
         `woven-hero-folio-${width}.webp`,
         `woven-hero-folio-${width}.avif`,
       ]),
-      "social-card.jpg",
     ]
     const outputs = Array.isArray(manifest.outputs) ? manifest.outputs : []
     const outputsByPath = new Map(outputs.map((output) => [output?.path, output]))
@@ -117,15 +116,6 @@ if (checkOnly) {
     ]
   })
 
-  outputJobs.push({
-    fileName: "social-card.jpg",
-    render: () =>
-      sharp(source)
-        .resize({ width: 1200, height: 630, fit: "cover", position: "centre" })
-        .jpeg({ quality: 88, mozjpeg: true, progressive: true })
-        .toBuffer(),
-  })
-
   const outputs = await Promise.all(
     outputJobs.map(async ({ fileName, render }) => ({
       fileName,
@@ -158,5 +148,5 @@ if (checkOnly) {
   }
 
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
-  console.log("Generated responsive hero assets, social-card.jpg and their integrity manifest")
+  console.log("Generated responsive hero assets and their integrity manifest")
 }
