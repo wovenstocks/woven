@@ -1,5 +1,10 @@
 # Woven tokenomics
 
+Official BNB Smart Chain contract:
+[`0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff`](https://bscscan.com/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff).
+Protocol activation remains gated until the Four.meme token has graduated and
+the launch preflight confirms `_mode() == 0` and renounced ownership.
+
 ## Documented parameters
 
 | Parameter                              |     Current value |

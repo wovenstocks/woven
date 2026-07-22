@@ -65,6 +65,7 @@ describe("BNB build-time network profile", () => {
     expect([bnbNetworkProfiles.mainnet, bnbNetworkProfiles.testnet]).toContain(bnbNetwork)
     expect(wovenContracts.network).toBe(bnbNetwork.key)
     expect(wovenContracts.chainId).toBe(bnbNetwork.chainId)
+    expect(wovenContracts.wovenToken).toBe("0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff")
     expect(bnbWalletParams).toEqual({
       chainId: bnbNetwork.chainIdHex,
       chainName: bnbNetwork.chainName,

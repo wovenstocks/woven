@@ -36,6 +36,11 @@ test("landing page is responsive, original and accessible", async ({ page }) => 
     "https://github.com/wovenstocks/woven",
   )
   const header = page.locator("header.site-header")
+  await expect(
+    header.locator(
+      '.site-nav a[href="https://four.meme/en/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff"]',
+    ),
+  ).toHaveCount(1)
   await expect(header.locator('a[aria-label="Woven on X"]')).toHaveAttribute(
     "href",
     "https://x.com/wovenstocks",
@@ -50,6 +55,11 @@ test("landing page is responsive, original and accessible", async ({ page }) => 
   )
   await expect(page.getByText("Risk & eligibility", { exact: true })).toHaveCount(0)
   await expect(page.getByRole("link", { name: "Licenses", exact: true })).toHaveCount(0)
+  await expect(page.getByRole("link", { name: /0xE40b8931.*C1Ffff/ })).toHaveAttribute(
+    "href",
+    "https://bscscan.com/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff",
+  )
+  await expect(page.getByRole("button", { name: "Copy WOVEN contract" })).toBeVisible()
   await expectNoHorizontalOverflow(page)
   await expectNoSeriousAccessibilityViolations(page)
 })
@@ -61,6 +71,10 @@ test("mobile navigation reaches every primary product area", async ({ page }, te
   await page.getByRole("button", { name: "Open menu" }).click()
   const navigation = page.getByRole("navigation", { name: "Mobile navigation" })
   await expect(navigation).toBeVisible()
+  await expect(navigation.getByRole("link", { name: "Buy $WOVEN" })).toHaveAttribute(
+    "href",
+    "https://four.meme/en/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff",
+  )
   await expect(navigation.getByRole("link", { name: "Woven on X" })).toHaveAttribute(
     "href",
     "https://x.com/wovenstocks",
@@ -78,6 +92,11 @@ test("mobile navigation reaches every primary product area", async ({ page }, te
 
 test("basket detail keeps buy, mint and redeem distinct", async ({ page }) => {
   await page.goto("/#app")
+  await expect(
+    page.locator(
+      '.app-nav a[href="https://four.meme/en/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff"]',
+    ),
+  ).toHaveCount(1)
   await page.getByRole("button", { name: "View Woven Core Four basket" }).click()
 
   await expect(page.getByRole("heading", { name: "Woven Core Four", level: 1 })).toBeVisible()

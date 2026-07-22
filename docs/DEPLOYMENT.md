@@ -51,6 +51,12 @@ deployed profile with the launch preflight below.
 
 ## WOVEN launch and graduation gate
 
+The canonical WOVEN launch contract is
+[`0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff`](https://bscscan.com/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff).
+The address may be configured in the public web client while trading remains on
+the Four.meme curve, but the protocol deployment stays blocked until every gate
+below passes.
+
 The contract core must not be deployed while WOVEN remains on the Four.meme
 bonding curve. The final token must have all of these onchain properties:
 
@@ -85,7 +91,7 @@ npm run launch:verify -- \
   --owner 0xREPLACE_WITH_PUBLIC_OWNER_ADDRESS \
   --safe 0xREPLACE_WITH_PROTOCOL_SAFE \
   --safe-creation-tx 0xREPLACE_WITH_SAFE_CREATION_TRANSACTION \
-  --woven 0xREPLACE_WITH_WOVEN_TOKEN
+  --woven 0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff
 ```
 
 The output is evidence for the release review, not authorization to deploy.
@@ -264,7 +270,7 @@ VITE_BNB_NETWORK=mainnet
 VITE_PUBLIC_LAUNCH_LIVE=false
 VITE_PUBLIC_SITE_URL=https://wovenstocks.com
 
-VITE_WOVEN_TOKEN=
+VITE_WOVEN_TOKEN=0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff
 VITE_CREATOR_LICENSE=
 VITE_ASSET_REGISTRY=
 VITE_FEE_SPLITTER=

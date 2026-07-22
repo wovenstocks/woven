@@ -1,4 +1,5 @@
 import { bnbNetworkProfiles, createBnbWalletParams, resolveBnbNetworkProfile } from "./bnbNetworks"
+import { WOVEN_TOKEN_ADDRESS } from "./tokenomics"
 
 const addressPattern = /^0x[a-fA-F0-9]{40}$/
 const zeroAddressPattern = /^0x0{40}$/i
@@ -31,7 +32,8 @@ export const wovenContracts = Object.freeze({
   explorerBaseUrl: bnbNetwork.explorerBaseUrl,
   rpcUrl: bnbNetwork.rpcUrl,
   rpcUrls: bnbNetwork.rpcUrls,
-  wovenToken: import.meta.env.VITE_WOVEN_TOKEN || "",
+  wovenToken:
+    import.meta.env.VITE_WOVEN_TOKEN || (bnbNetwork.key === "mainnet" ? WOVEN_TOKEN_ADDRESS : ""),
   creatorLicense: import.meta.env.VITE_CREATOR_LICENSE || "",
   assetRegistry: import.meta.env.VITE_ASSET_REGISTRY || "",
   feeSplitter: import.meta.env.VITE_FEE_SPLITTER || "",

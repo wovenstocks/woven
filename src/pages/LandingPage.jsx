@@ -1,10 +1,26 @@
-import { useState } from "react"
-import { ArrowDown, ArrowRight, Blocks, Flame, RefreshCcw, Sparkles } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import {
+  ArrowDown,
+  ArrowRight,
+  Blocks,
+  Check,
+  Copy,
+  ExternalLink,
+  Flame,
+  RefreshCcw,
+  Sparkles,
+} from "lucide-react"
 import { siGithub } from "simple-icons"
 import { Brand, StockBadge } from "../components/Brand"
 import { Reveal } from "../components/Reveal"
 import { SiteHeader } from "../components/SiteHeader"
-import { formatWoven, WOVEN_TOKENOMICS } from "../config/tokenomics"
+import {
+  formatWoven,
+  WOVEN_EXPLORER_URL,
+  WOVEN_FOUR_MEME_URL,
+  WOVEN_TOKEN_ADDRESS,
+  WOVEN_TOKENOMICS,
+} from "../config/tokenomics"
 import { marketedBaskets, stocks } from "../data/baskets"
 
 const toneBySymbol = Object.fromEntries(stocks.map((stock) => [stock.symbol, stock.tone]))
@@ -67,6 +83,8 @@ function BasketPanel({ basket, active, onSelect, onOpen }) {
 
 export function LandingPage({ onNavigate }) {
   const [activeBasketId, setActiveBasketId] = useState(marketedBaskets[0].id)
+  const [contractCopied, setContractCopied] = useState(false)
+  const copyResetTimerRef = useRef(null)
   const activeBasket =
     marketedBaskets.find((basket) => basket.id === activeBasketId) || marketedBaskets[0]
 
@@ -75,6 +93,27 @@ export function LandingPage({ onNavigate }) {
     const target = document.getElementById("baskets")
     target?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" })
     target?.focus({ preventScroll: true })
+  }
+
+  useEffect(
+    () => () => {
+      if (copyResetTimerRef.current !== null) window.clearTimeout(copyResetTimerRef.current)
+    },
+    [],
+  )
+
+  const copyContract = async () => {
+    try {
+      await navigator.clipboard.writeText(WOVEN_TOKEN_ADDRESS)
+      setContractCopied(true)
+      if (copyResetTimerRef.current !== null) window.clearTimeout(copyResetTimerRef.current)
+      copyResetTimerRef.current = window.setTimeout(() => {
+        setContractCopied(false)
+        copyResetTimerRef.current = null
+      }, 1800)
+    } catch {
+      setContractCopied(false)
+    }
   }
 
   return (
@@ -288,13 +327,30 @@ export function LandingPage({ onNavigate }) {
               Send 10,000 $WOVEN permanently to the published dead address to unlock basket
               creation. Creators receive 60% of the basket-token fees issued on completed mints.
             </p>
-            <button
+            <a
               className="button button--outline"
-              type="button"
-              onClick={() => onNavigate("studio")}
+              href={WOVEN_FOUR_MEME_URL}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Create a basket <ArrowRight size={16} />
-            </button>
+              Buy $WOVEN <ExternalLink size={15} />
+            </a>
+            <div className="woven-contract">
+              <span>Official contract</span>
+              <div>
+                <a href={WOVEN_EXPLORER_URL} target="_blank" rel="noopener noreferrer">
+                  {WOVEN_TOKEN_ADDRESS}
+                  <ExternalLink size={13} aria-hidden="true" />
+                </a>
+                <button
+                  type="button"
+                  onClick={copyContract}
+                  aria-label={contractCopied ? "WOVEN contract copied" : "Copy WOVEN contract"}
+                >
+                  {contractCopied ? <Check size={15} /> : <Copy size={15} />}
+                </button>
+              </div>
+            </div>
           </Reveal>
           <Reveal className="license-spec" delay={70}>
             <div className="license-spec__seal">
