@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a focused improvement with explicit trust and safety effects.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or developer problem needs to be solved?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest coherent solution, not only the interface treatment.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: textarea
+    id: effects
+    attributes:
+      label: Security and trust effects
+      description: Describe new permissions, external dependencies, asset assumptions, failure modes, and migration needs.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and pull requests.
+          required: true
+        - label: I am not using this form to disclose a vulnerability.
+          required: true

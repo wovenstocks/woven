@@ -1,0 +1,17 @@
+.npm-cache/
+.vercel/
+contracts/cache/
+contracts/lib/
+contracts/out/
+contracts/security-artifacts/*.txt
+coverage/
+dist/
+node_modules/
+reference/
+package-lock.json
+public/**/*.avif
+public/**/*.gif
+public/**/*.jpeg
+public/**/*.jpg
+public/**/*.png
+public/**/*.webp

@@ -1,0 +1,19 @@
+{
+  "schema": "woven-prepared-transaction-plan/v1",
+  "releaseId": null,
+  "attemptId": null,
+  "network": {
+    "name": "bnb-smart-chain-mainnet",
+    "chainId": 56
+  },
+  "transactions": [
+    {
+      "id": "creator-approve-woven-license",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "data": null,
+      "expiresAtUtc": null
+    }
+  ]
+}

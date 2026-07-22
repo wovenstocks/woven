@@ -1,0 +1,675 @@
+{
+  "schema": "woven-launch-signing-receipts/v1",
+  "releaseId": null,
+  "attemptId": null,
+  "status": "pending",
+  "network": {
+    "name": "bnb-smart-chain-mainnet",
+    "chainId": 56,
+    "explorerBaseUrl": "https://bscscan.com"
+  },
+  "release": {
+    "gitCommit": null,
+    "gitTreeClean": null,
+    "sourceArchiveSha256": null,
+    "artifactManifestSha256": null,
+    "nodeVersion": null,
+    "npmVersion": null,
+    "foundryVersion": null,
+    "solcVersion": "0.8.24",
+    "operatorPublicId": null,
+    "independentReviewerPublicId": null,
+    "startedAtUtc": null,
+    "completedAtUtc": null
+  },
+  "privacyPolicy": {
+    "publicEvidenceOnly": true,
+    "forbiddenData": [
+      "seed phrase",
+      "private key",
+      "keystore file",
+      "keystore password",
+      "wallet export",
+      "authenticated RPC URL",
+      "API token",
+      "session cookie",
+      "exchange credential"
+    ]
+  },
+  "existingControlPlane": {
+    "reuseExistingSafe": true,
+    "runSafePrepare": false,
+    "ownerWallet": "0x9b32E54046e0061a0139C62827B76CF2f19e1DfC",
+    "protocolSafe": "0xF97FC34f97E556271E824D4011A02E5Fa78658fE",
+    "treasury": "0xF97FC34f97E556271E824D4011A02E5Fa78658fE",
+    "safeCreationTransactionHash": "0xeaac144ce794eccd7e3509bf478d745c97f80a1ee00a87bf5ffe213e5768c948",
+    "reviewedProfile": {
+      "version": "1.4.1",
+      "owners": ["0x9b32E54046e0061a0139C62827B76CF2f19e1DfC"],
+      "threshold": 1,
+      "modulesExpected": [],
+      "guardExpected": "0x0000000000000000000000000000000000000000",
+      "fallbackHandler": null,
+      "singleton": null,
+      "proxyFactory": null,
+      "safeProxyRuntimeCodehash": null,
+      "lastVerifiedBlockNumber": null,
+      "lastVerifiedBlockHash": null,
+      "lastVerifiedAtUtc": null,
+      "launchPreflightEvidenceSha256": null,
+      "status": "pending-reverification"
+    }
+  },
+  "publicInputs": {
+    "wovenToken": null,
+    "deploymentSigner": null,
+    "creator": null,
+    "usdc": null,
+    "usdt": null,
+    "bstocks": {
+      "NVDAB": null,
+      "MSFTB": null,
+      "TSLAB": null,
+      "QQQB": null
+    },
+    "primaryIssuerEvidenceSha256": null,
+    "bstockTechnicalPreflightSha256": null,
+    "eligibilityModelApprovalSha256": null,
+    "externalAssetReviewApprovalSha256": null,
+    "independentSecurityReviewSha256": null
+  },
+  "readOnlyGates": [
+    {
+      "id": "release-evidence",
+      "command": "npm run release:evidence",
+      "evidenceSha256": null,
+      "observedAtUtc": null,
+      "status": "pending"
+    },
+    {
+      "id": "woven-and-existing-safe-preflight",
+      "command": "npm run launch:verify -- --network mainnet --owner 0x9b32E54046e0061a0139C62827B76CF2f19e1DfC --safe 0xF97FC34f97E556271E824D4011A02E5Fa78658fE --safe-creation-tx 0xeaac144ce794eccd7e3509bf478d745c97f80a1ee00a87bf5ffe213e5768c948 --woven 0xFINAL_WOVEN_ADDRESS",
+      "evidenceSha256": null,
+      "observedBlockNumber": null,
+      "observedBlockHash": null,
+      "observedAtUtc": null,
+      "status": "pending"
+    },
+    {
+      "id": "bstock-technical-preflight",
+      "command": "npm run bstocks:verify -- --network mainnet NVDAB=0xADDRESS MSFTB=0xADDRESS TSLAB=0xADDRESS QQQB=0xADDRESS",
+      "evidenceSha256": null,
+      "observedBlockNumber": null,
+      "observedBlockHash": null,
+      "observedAtUtc": null,
+      "status": "pending"
+    },
+    {
+      "id": "core-simulation",
+      "script": "contracts/script/DeployCore.s.sol:DeployCore",
+      "signingSurface": "foundry-simulation-no-signature",
+      "environmentDigestSha256": null,
+      "simulationEvidenceSha256": null,
+      "observedAtUtc": null,
+      "status": "pending"
+    },
+    {
+      "id": "router-simulation",
+      "script": "contracts/script/DeployBuyRouter.s.sol:DeployBuyRouter",
+      "signingSurface": "foundry-simulation-no-signature",
+      "environmentDigestSha256": null,
+      "routeConfigurationHash": null,
+      "simulationEvidenceSha256": null,
+      "observedBlockNumber": null,
+      "observedBlockHash": null,
+      "observedAtUtc": null,
+      "status": "pending"
+    },
+    {
+      "id": "core4-simulation",
+      "script": "contracts/script/DeployCoreFour.s.sol:DeployCoreFour",
+      "signingSurface": "foundry-simulation-no-signature",
+      "environmentDigestSha256": null,
+      "coreFourConfigurationHash": null,
+      "expectedFactoryBasketCount": null,
+      "rawUnits": {
+        "NVDAB": null,
+        "MSFTB": null,
+        "TSLAB": null,
+        "QQQB": null
+      },
+      "simulationEvidenceSha256": null,
+      "observedBlockNumber": null,
+      "observedBlockHash": null,
+      "observedAtUtc": null,
+      "status": "pending"
+    }
+  ],
+  "transactionDefaults": {
+    "statusValues": [
+      "pending",
+      "submitted",
+      "confirmed",
+      "reverted",
+      "replaced",
+      "superseded",
+      "not-applicable"
+    ],
+    "receiptStatusRequiredForConfirmation": 1,
+    "requiredReceiptFields": [
+      "transactionHash",
+      "blockNumber",
+      "blockHash",
+      "status",
+      "from",
+      "to",
+      "gasUsed"
+    ]
+  },
+  "transactions": [
+    {
+      "id": "woven-four-meme-launch",
+      "phase": "woven",
+      "required": true,
+      "signerRole": "owner-wallet",
+      "signingSurface": "metamask-or-four-meme-wallet-flow",
+      "from": "0x9b32E54046e0061a0139C62827B76CF2f19e1DfC",
+      "to": null,
+      "valueWei": null,
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Create Woven Stocks (WOVEN) using the separately approved Four.meme profile",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "WOVEN",
+          "address": null,
+          "runtimeCodehash": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "woven-four-meme-graduation",
+      "phase": "woven",
+      "required": true,
+      "signerRole": "external-platform-or-market",
+      "signingSurface": "external-event-record",
+      "from": null,
+      "to": null,
+      "valueWei": null,
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Record the transaction or transactions that establish Four.meme mode 0 and final graduated state",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "core-deploy-creator-license",
+      "phase": "core",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy CreatorLicense with final WOVEN token",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "CreatorLicense",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "core-deploy-asset-registry",
+      "phase": "core",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy CanonicalAssetRegistry owned by the pinned protocol Safe",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "CanonicalAssetRegistry",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "core-deploy-fee-splitter",
+      "phase": "core",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy FeeSplitter with the pinned protocol Safe as treasury",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "FeeSplitter",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "core-deploy-curator-guardian",
+      "phase": "core",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy CuratorGuardian controlled by the pinned protocol Safe",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "CuratorGuardian",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "core-deploy-basket-factory",
+      "phase": "core",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy BasketFactory with reviewed core wiring",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "BasketFactory",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "safe-registry-admit-core4-assets",
+      "phase": "registry",
+      "required": true,
+      "signerRole": "safe-owner",
+      "signingSurface": "safe-transaction-signed-with-metamask",
+      "from": "0xF97FC34f97E556271E824D4011A02E5Fa78658fE",
+      "safeOwner": "0x9b32E54046e0061a0139C62827B76CF2f19e1DfC",
+      "to": null,
+      "valueWei": "0",
+      "operation": "CALL",
+      "safeNonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "CanonicalAssetRegistry.setAssets([NVDAB,MSFTB,TSLAB,QQQB], true)",
+      "safeTransactionHash": null,
+      "ownerSignatureRecordedAtUtc": null,
+      "executorTransactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "router-deploy-uniswap-v4-adapter",
+      "phase": "router",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy route-bound UniswapV4ExactOutputAdapter",
+      "routeConfigurationHash": null,
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "UniswapV4ExactOutputAdapter",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "router-deploy-pancake-v3-adapter",
+      "phase": "router",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy route-bound PancakeV3ExactOutputAdapter",
+      "routeConfigurationHash": null,
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "PancakeV3ExactOutputAdapter",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "router-deploy-one-click-basket-router",
+      "phase": "router",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "Deploy OneClickBasketRouter with exact reviewed adapters and core wiring",
+      "routeConfigurationHash": null,
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "OneClickBasketRouter",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "creator-approve-woven-license",
+      "phase": "creator-license",
+      "required": true,
+      "signerRole": "creator",
+      "signingSurface": "metamask-direct-transaction-or-foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "WOVEN.approve(CreatorLicense, 10000000000000000000000)",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "creator-burn-for-license",
+      "phase": "creator-license",
+      "required": true,
+      "signerRole": "creator",
+      "signingSurface": "metamask-direct-transaction-or-foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "CreatorLicense.burnForLicense()",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "core4-create-basket",
+      "phase": "core4",
+      "required": true,
+      "signerRole": "licensed-creator",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "BasketFactory.createBasket(Woven Core Four, CORE4, [NVDAB,MSFTB,TSLAB,QQQB], reviewedRawUnits, 30, 1000e18)",
+      "coreFourConfigurationHash": null,
+      "expectedFactoryBasketCountBefore": null,
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [
+        {
+          "name": "BasketToken:CORE4",
+          "address": null,
+          "runtimeCodehash": null,
+          "constructorArgumentsSha256": null,
+          "verifiedSourceUrl": null
+        }
+      ],
+      "factoryBasketCountAfter": null,
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "canary-usdc-approval",
+      "phase": "mainnet-canary",
+      "required": "only-if-current-allowance-is-insufficient",
+      "signerRole": "canary-payer",
+      "signingSurface": "metamask-direct-transaction",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "USDC approval limited to the reviewed canary requirement",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "canary-mint-with-usdc",
+      "phase": "mainnet-canary",
+      "required": true,
+      "signerRole": "canary-payer",
+      "signingSurface": "metamask-direct-transaction",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "OneClickBasketRouter.mintWithUsdc using reviewed per-leg maxima, total maximum, recipient, and deadline",
+      "quoteBlockNumber": null,
+      "quoteBlockHash": null,
+      "deadlineUtc": null,
+      "maximumUsdcInputRaw": null,
+      "perLegMaximumUsdcInputRaw": {
+        "NVDAB": null,
+        "MSFTB": null,
+        "TSLAB": null,
+        "QQQB": null
+      },
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "balanceDeltas": {
+        "payerUsdcDebitRaw": null,
+        "payerUsdcRefundRaw": null,
+        "payerCore4CreditRaw": null,
+        "routerFinalUsdcRaw": null,
+        "routerFinalNvdabRaw": null,
+        "routerFinalMsftbRaw": null,
+        "routerFinalTslabRaw": null,
+        "routerFinalQqqbRaw": null,
+        "uniswapAdapterFinalBalancesSha256": null,
+        "pancakeAdapterFinalBalancesSha256": null
+      },
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    }
+  ],
+  "contractReadbacks": {
+    "coreWiringEvidenceSha256": null,
+    "registryOwner": null,
+    "registryPendingOwner": null,
+    "registrySupportedAssets": [],
+    "feeSplitterTreasury": null,
+    "routerWiringEvidenceSha256": null,
+    "routerStartingBalanceEvidenceSha256": null,
+    "coreFour": {
+      "address": null,
+      "creator": null,
+      "assetOrder": ["NVDAB", "MSFTB", "TSLAB", "QQQB"],
+      "rawUnits": [null, null, null, null],
+      "mintFeeBps": 30,
+      "initialSupplyCapRaw": "1000000000000000000000",
+      "maximumSupplyCapRaw": "1000000000000000000000000",
+      "guardian": null,
+      "feeRecipient": null,
+      "readbackEvidenceSha256": null
+    }
+  },
+  "webRelease": {
+    "vercelDeploymentId": null,
+    "immutableDeploymentUrl": null,
+    "productionDomain": null,
+    "gitCommit": null,
+    "environmentAddressDigestSha256": null,
+    "buildArtifactDigestSha256": null,
+    "securityHeaderEvidenceSha256": null,
+    "desktopTestEvidenceSha256": null,
+    "mobileTestEvidenceSha256": null,
+    "deployedAtUtc": null,
+    "status": "pending"
+  },
+  "approvals": [
+    {
+      "role": "contract-engineering",
+      "approverPublicId": null,
+      "approvedAtUtc": null,
+      "evidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "role": "independent-security-review",
+      "approverPublicId": null,
+      "approvedAtUtc": null,
+      "evidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "role": "safe-and-treasury-operations",
+      "approverPublicId": null,
+      "approvedAtUtc": null,
+      "evidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "role": "external-asset-review",
+      "approverPublicId": null,
+      "approvedAtUtc": null,
+      "evidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "role": "legal-and-jurisdiction-review",
+      "approverPublicId": null,
+      "approvedAtUtc": null,
+      "evidenceSha256": null,
+      "status": "pending"
+    },
+    {
+      "role": "web-release",
+      "approverPublicId": null,
+      "approvedAtUtc": null,
+      "evidenceSha256": null,
+      "status": "pending"
+    }
+  ],
+  "exceptions": [],
+  "completion": {
+    "allRequiredTransactionsConfirmed": false,
+    "allConfirmedReceiptStatusesEqualOne": false,
+    "allContractSourcesVerified": false,
+    "allReadbacksMatchApprovedInputs": false,
+    "mainnetCanaryPassed": false,
+    "allApprovalsConfirmed": false,
+    "blockingExceptionCount": null,
+    "finalManifestSha256": null,
+    "status": "pending"
+  }
+}

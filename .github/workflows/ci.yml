@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Pin npm
+        run: npm install --global npm@11.16.0 --ignore-scripts --no-audit --no-fund
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Check generated image assets
+        run: npm run assets:check
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser, mobile, and accessibility smoke tests
+        run: npm run test:e2e
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Pin npm
+        run: npm install --global npm@11.16.0 --ignore-scripts --no-audit --no-fund
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@b00af27efadbc7b4ca8b82abbd903b17cc874d2a # v1.9.0
+        with:
+          version: v1.7.1
+
+      - name: Install Solidity test dependency
+        working-directory: contracts
+        run: >-
+          forge install foundry-rs/forge-std@rev=bf647bd6046f2f7da30d0c2bf435e5c76a780c1b
+          --no-git --shallow
+
+      - name: Install Slither
+        run: python -m pip install --disable-pip-version-check -r .github/slither-requirements.txt
+
+      - name: Check contract formatting
+        run: npm run contracts:fmt
+
+      - name: Build contracts
+        run: npm run contracts:build
+
+      - name: Test contracts
+        run: npm run contracts:test
+
+      - name: Run Slither
+        run: |
+          mkdir -p security-output
+          slither contracts \
+            --exclude-dependencies \
+            --exclude reentrancy-balance \
+            --fail-high \
+            --json security-output/slither.json
+
+          # Slither flags balance-delta checks around external calls even though
+          # every affected production entry point is nonReentrant. Preserve the
+          # complete detector output for review without weakening other High gates.
+          slither contracts \
+            --exclude-dependencies \
+            --detect reentrancy-balance \
+            --fail-none \
+            --json security-output/slither-reentrancy-balance.json
+
+      - name: Analyze deployment validation
+        run: |
+          slither contracts/script/DeployCore.s.sol \
+            --compile-force-framework foundry \
+            --exclude-dependencies \
+            --exclude reentrancy-balance \
+            --fail-high \
+            --json security-output/deploy-core.json
+
+          slither contracts/script/DeployBuyRouter.s.sol \
+            --compile-force-framework foundry \
+            --exclude-dependencies \
+            --exclude reentrancy-balance \
+            --fail-high \
+            --json security-output/deploy-buy-router.json
+
+          slither contracts/script/DeployCoreFour.s.sol \
+            --compile-force-framework foundry \
+            --exclude-dependencies \
+            --exclude reentrancy-balance \
+            --fail-high \
+            --json security-output/deploy-core-four.json
+
+      - name: Check basket ERC-20 conformance
+        run: >-
+          slither-check-erc contracts BasketToken
+          --erc ERC20
+          --json security-output/basket-token-erc20.json
+
+      - name: Create release evidence
+        run: |
+          npm run build
+          npm run contracts:build
+          npm run release:evidence
+
+      - name: Upload security and release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: woven-evidence-${{ github.sha }}
+          path: |
+            security-output/
+            release-evidence/
+          if-no-files-found: warn
+          retention-days: 30

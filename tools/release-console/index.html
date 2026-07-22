@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <title>Woven Release Console</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Woven release console home">
+        <span class="brand-mark" aria-hidden="true">W</span>
+        <span>Woven Release Console</span>
+      </a>
+      <span class="local-badge">Localhost only</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Explicit transaction signing</p>
+        <h1 id="page-title">Review one transaction at a time.</h1>
+        <p>
+          This local tool never stores a key, signs automatically, or submits a batch. It sends only
+          the exact transaction shown after a separate confirmation click in MetaMask.
+        </p>
+      </section>
+
+      <section class="gate-panel" aria-labelledby="gate-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Safety gates</p>
+            <h2 id="gate-heading">Session</h2>
+          </div>
+          <button id="connect-wallet" type="button">Connect MetaMask</button>
+        </div>
+        <dl class="gate-grid">
+          <div>
+            <dt>Origin</dt>
+            <dd id="origin-status">Checking…</dd>
+          </div>
+          <div>
+            <dt>Wallet</dt>
+            <dd id="wallet-status">Not connected</dd>
+          </div>
+          <div>
+            <dt>Account</dt>
+            <dd id="account-status">Not connected</dd>
+          </div>
+          <div>
+            <dt>Chain</dt>
+            <dd id="chain-status">Not connected</dd>
+          </div>
+        </dl>
+        <div class="gate-actions">
+          <button id="switch-chain" class="secondary" type="button" hidden>Switch network</button>
+          <p id="session-message" class="status-message" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="manifest-panel" aria-labelledby="manifest-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Reviewed input</p>
+            <h2 id="manifest-heading">Unsigned manifest</h2>
+          </div>
+          <label class="file-button" for="manifest-file">Load JSON</label>
+          <input id="manifest-file" type="file" accept="application/json,.json" />
+        </div>
+        <p class="supporting-copy">
+          Load only a <code>woven-unsigned-transactions/v1</code> manifest produced from the launch
+          record and reviewed prepared plan. The incomplete launch template is never executable.
+        </p>
+        <div id="manifest-summary" class="manifest-summary" hidden></div>
+        <p id="manifest-message" class="status-message" role="status" aria-live="polite">
+          No manifest loaded.
+        </p>
+      </section>
+
+      <section class="transactions-panel" aria-labelledby="transactions-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">No batching</p>
+            <h2 id="transactions-heading">Transactions</h2>
+          </div>
+          <button id="export-receipts" class="secondary" type="button" disabled>
+            Export receipt records
+          </button>
+        </div>
+        <div id="transaction-list" class="transaction-list">
+          <div class="empty-state">A verified manifest will appear here.</div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="review-dialog" aria-labelledby="review-title">
+      <form method="dialog" class="dialog-shell">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Final local review</p>
+            <h2 id="review-title">Confirm one transaction</h2>
+          </div>
+          <button id="close-review" class="icon-button" value="cancel" aria-label="Close review">
+            ×
+          </button>
+        </div>
+        <p class="warning-copy">
+          MetaMask will open after the final button. Compare every field again inside MetaMask.
+          Connection approval is not transaction approval.
+        </p>
+        <dl id="review-fields" class="review-fields"></dl>
+        <label class="confirmation-check">
+          <input id="review-confirmation" type="checkbox" />
+          <span>I compared chain, sender, target, value, calldata and intent hash.</span>
+        </label>
+        <p id="review-message" class="status-message" role="status" aria-live="assertive"></p>
+        <div class="dialog-actions">
+          <button id="cancel-review" class="secondary" value="cancel">Cancel</button>
+          <button id="send-transaction" type="button" disabled>Send this transaction</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/app.mjs"></script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+# Dependencies and local caches
+node_modules/
+.npm-cache/
+.cache/
+.vite/
+.vitest/
+.eslintcache
+*.tsbuildinfo
+
+# Generated web output
+dist/
+dist-e2e/
+coverage/
+release-evidence/
+security-output/
+test-results/
+playwright-report/
+blob-report/
+
+# Local deployment state
+.vercel/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.e2e
+!.env.test
+
+# Generated contract output
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+contracts/lib/
+contracts/security-artifacts/slither-*.dot
+contracts/security-artifacts/slither-*.txt
+
+# Local tooling and operating-system files
+.DS_Store
+*.log
+*.tmp
+.idea/
+.vscode/
+
+# Non-public working material
+AGENTS.md
+design-qa.md
+reference/
+*-screenshot.*

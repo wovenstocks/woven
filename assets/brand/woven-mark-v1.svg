@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Woven Stocks mark</title>
+  <desc id="desc">A warm ivory W crossed by an antique brass thread in an alternating over-under weave.</desc>
+  <defs>
+    <mask id="thread-over">
+      <rect width="1000" height="1000" fill="#000"/>
+      <path d="M210 258 372 702" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="118"/>
+      <path d="M500 302 638 702" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="118"/>
+    </mask>
+  </defs>
+
+  <rect width="1000" height="1000" fill="#101116"/>
+
+  <!-- The brass thread sits behind the W, then resurfaces at alternating crossings. -->
+  <path d="M242 500H758" fill="none" stroke="#A7864D" stroke-linecap="square" stroke-width="58"/>
+
+  <path
+    d="M210 258 372 702 500 302 638 702 790 258"
+    fill="none"
+    stroke="#F3F0E8"
+    stroke-linecap="square"
+    stroke-linejoin="miter"
+    stroke-width="118"
+  />
+
+  <path
+    d="M242 500H758"
+    fill="none"
+    stroke="#A7864D"
+    stroke-linecap="square"
+    stroke-width="58"
+    mask="url(#thread-over)"
+  />
+</svg>
