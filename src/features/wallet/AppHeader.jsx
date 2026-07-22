@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { Brand } from "../../components/Brand"
 import { wovenContracts } from "../../config/contracts"
+import { WOVEN_FOUR_MEME_URL } from "../../config/tokenomics"
 import { compactAddress, copyToClipboard, focusableSelector } from "../shared"
 
 function WalletControl({ wallet, open, onOpenChange }) {
@@ -342,6 +343,9 @@ export function AppHeader({ view, onNavigate, wallet, walletPanelRequest }) {
             {label}
           </button>
         ))}
+        <a href={WOVEN_FOUR_MEME_URL} target="_blank" rel="noopener noreferrer">
+          Buy $WOVEN
+        </a>
       </nav>
       {wallet.account && wallet.chainId !== null && !wallet.isBnbChain ? (
         <button
@@ -399,6 +403,9 @@ export function AppHeader({ view, onNavigate, wallet, walletPanelRequest }) {
               {label}
             </button>
           ))}
+          <a href={WOVEN_FOUR_MEME_URL} target="_blank" rel="noopener noreferrer">
+            Buy $WOVEN
+          </a>
         </nav>
       )}
     </header>

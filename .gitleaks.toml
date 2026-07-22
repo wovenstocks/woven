@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Canonical public WOVEN contract address"
+regexTarget = "secret"
+regexes = ['''0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff''']

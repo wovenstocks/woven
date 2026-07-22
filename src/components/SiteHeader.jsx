@@ -1,6 +1,7 @@
 import { Menu, X as CloseIcon } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { siGithub, siX } from "simple-icons"
+import { WOVEN_FOUR_MEME_URL } from "../config/tokenomics"
 import { Brand } from "./Brand"
 
 const focusableSelector = "button:not([disabled]), a[href]"
@@ -111,9 +112,9 @@ export function SiteHeader({ onNavigate }) {
         <button type="button" onClick={() => scrollToSection("how-it-works")}>
           How it works
         </button>
-        <button type="button" onClick={() => scrollToSection("tokenomics")}>
-          $WOVEN
-        </button>
+        <a href={WOVEN_FOUR_MEME_URL} target="_blank" rel="noopener noreferrer">
+          Buy $WOVEN
+        </a>
       </nav>
       <div className="header-actions">
         <HeaderSocialLinks />
@@ -149,9 +150,9 @@ export function SiteHeader({ onNavigate }) {
           <button type="button" onClick={() => scrollToSection("how-it-works")}>
             How it works
           </button>
-          <button type="button" onClick={() => scrollToSection("tokenomics")}>
-            $WOVEN
-          </button>
+          <a href={WOVEN_FOUR_MEME_URL} target="_blank" rel="noopener noreferrer">
+            Buy $WOVEN
+          </a>
           <button type="button" onClick={() => navigate("studio")}>
             Create a basket
           </button>

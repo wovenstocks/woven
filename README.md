@@ -1,6 +1,9 @@
 # Woven Stocks
 
-[Website](https://wovenstocks.com) · [X](https://x.com/wovenstocks)
+[Website](https://wovenstocks.com) · [Buy $WOVEN](https://four.meme/en/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff) · [X](https://x.com/wovenstocks)
+
+Official WOVEN contract on BNB Smart Chain:
+[`0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff`](https://bscscan.com/token/0xe40b89313d28d50ea8de94ca665617df2ac1ffff).
 
 Woven Stocks is a BNB Chain interface and smart-contract system for fixed,
 redeemable token baskets. Each basket token represents a defined quantity of

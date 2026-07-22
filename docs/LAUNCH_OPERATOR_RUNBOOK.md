@@ -21,6 +21,7 @@ mainnet:
 | Owner wallet               | `0x9b32E54046e0061a0139C62827B76CF2f19e1DfC`                                            |
 | Protocol Safe and treasury | `0xF97FC34f97E556271E824D4011A02E5Fa78658fE`                                            |
 | Safe creation transaction  | `0xeaac144ce794eccd7e3509bf478d745c97f80a1ee00a87bf5ffe213e5768c948`                    |
+| WOVEN launch contract      | `0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff`                                            |
 | Reviewed Safe profile      | Safe v1.4.1, one owner, threshold one, no modules, no guard, canonical fallback handler |
 
 The Safe creation evidence passed the repository-level pinned proxy-factory and
@@ -144,7 +145,7 @@ npm run launch:verify -- \
   --owner 0x9b32E54046e0061a0139C62827B76CF2f19e1DfC \
   --safe 0xF97FC34f97E556271E824D4011A02E5Fa78658fE \
   --safe-creation-tx 0xeaac144ce794eccd7e3509bf478d745c97f80a1ee00a87bf5ffe213e5768c948 \
-  --woven 0xREPLACE_WITH_FINAL_WOVEN_ADDRESS
+  --woven 0xE40b89313D28d50Ea8DE94cA665617df2aC1Ffff
 ```
 
 Retain the complete JSON output and its SHA-256 digest. A passing result must

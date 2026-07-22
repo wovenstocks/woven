@@ -335,15 +335,19 @@ section[tabindex="-1"]:focus {
   align-items: center;
   gap: 29px;
 }
-.site-nav button {
+.site-nav button,
+.site-nav a {
   min-width: 44px;
   min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   padding: 0 4px;
   color: #c8cacf;
   background: none;
   border: 0;
   cursor: pointer;
   font-size: 12px;
+  text-decoration: none;
   transition: color 0.2s var(--ease-out);
 }
 .header-actions {
@@ -925,6 +929,65 @@ section[tabindex="-1"]:focus {
 .tokenomics-copy .button {
   margin-top: 13px;
 }
+.woven-contract {
+  max-width: 520px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid #d8d5cc;
+}
+.woven-contract > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #777a75;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.woven-contract > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.woven-contract a {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #252a27;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.woven-contract button {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  color: #394039;
+  background: transparent;
+  border: 1px solid #cbc7bd;
+  border-radius: 50%;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+.woven-contract button:hover {
+  color: #f5f1e8;
+  background: #252a27;
+  border-color: #252a27;
+}
+.woven-contract button:active {
+  transform: scale(0.96);
+}
+.woven-contract button:focus-visible,
+.woven-contract a:focus-visible {
+  outline: 2px solid #98723c;
+  outline-offset: 3px;
+}
 .license-spec {
   min-height: 615px;
   position: relative;
@@ -1152,16 +1215,20 @@ section[tabindex="-1"]:focus {
   align-items: center;
   gap: 29px;
 }
-.app-nav button {
+.app-nav button,
+.app-nav a {
   min-width: 44px;
   min-height: 44px;
   position: relative;
+  display: inline-flex;
+  align-items: center;
   padding: 0 8px;
   color: #626762;
   border: 0;
   background: none;
   cursor: pointer;
   font-size: 11px;
+  text-decoration: none;
 }
 .app-nav button::after {
   content: "";
@@ -2400,7 +2467,8 @@ section[tabindex="-1"]:focus {
   .button--glass:hover {
     background: rgba(255, 255, 255, 0.14);
   }
-  .site-nav button:hover {
+  .site-nav button:hover,
+  .site-nav a:hover {
     color: #fff;
   }
   .header-social-links a:hover {
@@ -2473,8 +2541,11 @@ section[tabindex="-1"]:focus {
     transform-origin: top right;
     animation: menu-in 0.19s var(--ease-out) both;
   }
-  .mobile-nav button {
+  .mobile-nav > button,
+  .mobile-nav > a {
     min-height: 46px;
+    display: flex;
+    align-items: center;
     padding: 0 14px;
     color: #d6d7d7;
     border: 0;
@@ -2482,6 +2553,7 @@ section[tabindex="-1"]:focus {
     background: #20232a;
     text-align: left;
     font-size: 12px;
+    text-decoration: none;
   }
   .mobile-nav__socials {
     display: grid;
@@ -2560,14 +2632,19 @@ section[tabindex="-1"]:focus {
     transform-origin: top right;
     animation: menu-in 0.19s var(--ease-out) both;
   }
-  .app-mobile-nav button {
+  .app-mobile-nav > button,
+  .app-mobile-nav > a {
     min-height: 46px;
+    display: flex;
+    align-items: center;
     padding: 0 13px;
     border: 0;
     border-radius: 6px;
     background: transparent;
+    color: #30332f;
     text-align: left;
     font-size: 11px;
+    text-decoration: none;
   }
   .network-chip {
     display: none;
