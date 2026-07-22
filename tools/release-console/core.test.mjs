@@ -129,13 +129,25 @@ describe("release-console manifest validation", () => {
 })
 
 describe("release-console transaction and receipt records", () => {
-  it("normalizes lossless wallet hex quantities and rejects ambiguous inputs", () => {
+  it("normalizes lossless wallet quantities and rejects ambiguous inputs", () => {
     expect(quantityToDecimal("0x0")).toBe("0")
     expect(quantityToDecimal("0x04")).toBe("4")
     expect(quantityToDecimal("0x00000038")).toBe("56")
+    expect(quantityToDecimal(0)).toBe("0")
+    expect(quantityToDecimal(4)).toBe("4")
 
-    for (const invalid of ["0x", "4", "0x-1", "0xgg", 4, -1, null, undefined]) {
-      expect(() => quantityToDecimal(invalid)).toThrow("is not a hexadecimal quantity")
+    for (const invalid of [
+      "0x",
+      "4",
+      "0x-1",
+      "0xgg",
+      -1,
+      1.5,
+      Number.MAX_SAFE_INTEGER + 1,
+      null,
+      undefined,
+    ]) {
+      expect(() => quantityToDecimal(invalid)).toThrow("is not a lossless hexadecimal quantity")
     }
   })
 

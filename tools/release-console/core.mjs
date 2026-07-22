@@ -354,12 +354,19 @@ export function decimalToQuantity(valueWei) {
 }
 
 export function quantityToDecimal(value, label = "RPC quantity") {
-  // Browser-wallet providers occasionally zero-pad JSON-RPC quantities (for example, `0x04`).
-  // Accept that lossless representation, then normalize it immediately through BigInt. Decimal
-  // strings, numbers, signs, empty hex and non-hex data remain rejected.
+  // Browser-wallet providers can return a safe integer here even though JSON-RPC specifies a hex
+  // quantity. Accept only a non-negative safe integer, then normalize it immediately through
+  // BigInt. This keeps fractional, negative, rounded and otherwise ambiguous numeric inputs out.
+  if (typeof value === "number") {
+    if (Number.isSafeInteger(value) && value >= 0) return BigInt(value).toString(10)
+    throw new Error(`${label} is not a lossless hexadecimal quantity (received number).`)
+  }
+
+  // Some providers also zero-pad quantities (for example, `0x04`). That representation is
+  // lossless. Decimal strings, signs, empty hex and non-hex data remain rejected.
   if (typeof value !== "string" || !/^0x[0-9a-fA-F]+$/.test(value)) {
     const received = typeof value === "string" ? JSON.stringify(value) : typeof value
-    throw new Error(`${label} is not a hexadecimal quantity (received ${received}).`)
+    throw new Error(`${label} is not a lossless hexadecimal quantity (received ${received}).`)
   }
   return BigInt(value).toString(10)
 }
