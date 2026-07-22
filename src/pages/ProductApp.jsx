@@ -253,17 +253,7 @@ export function ProductApp({
   )
 
   useEffect(() => {
-    const title =
-      initialView === "basket" && basket
-        ? `${basket.name} · Woven Stocks`
-        : initialView === "portfolio"
-          ? "Portfolio · Woven Stocks"
-          : initialView === "studio"
-            ? "Create a Basket · Woven Stocks"
-            : initialView === "app"
-              ? "Baskets · Woven Stocks"
-              : "Not Found · Woven Stocks"
-    document.title = title
+    document.title = "Woven"
     const frame = window.requestAnimationFrame(() => {
       document.querySelector(".route-stage main")?.focus({ preventScroll: true })
     })

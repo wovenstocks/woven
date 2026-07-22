@@ -19,8 +19,9 @@ each dependency.
 
 Exact JavaScript versions are recorded in `package-lock.json`. The Forge Standard
 Library revision used by CI is pinned in `.github/workflows/ci.yml`. Installed npm
-packages retain their license files. Notices shipped with the production assets
-are available at [`public/third-party-licenses.txt`](public/third-party-licenses.txt).
+packages retain their license files. The bundled font and icon license text is
+retained in [`THIRD_PARTY_LICENSES.txt`](THIRD_PARTY_LICENSES.txt) without exposing
+an unrelated legal link in the product interface.
 
 ## Adapted protocol work
 

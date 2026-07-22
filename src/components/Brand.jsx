@@ -18,28 +18,12 @@ const logoBySymbol = {
 }
 
 export function Brand({ compact = false }) {
-  const markSize = compact ? 19 : 24
+  const markSize = compact ? 27 : 34
 
   return (
     <span className={`brand ${compact ? "brand--compact" : ""}`}>
       <span className="brand__mark" aria-hidden="true">
-        <svg width={markSize} height={markSize} viewBox="0 0 28 28" fill="none" focusable="false">
-          <path
-            d="M3.75 6.25 8.9 21.5 14 7.25l5.1 14.25 5.15-15.25"
-            stroke="currentColor"
-            strokeWidth="3.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="m7.15 16.35 1.75 5.15L14 7.25l1.78 4.98"
-            stroke="currentColor"
-            strokeWidth="1.15"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.38"
-          />
-        </svg>
+        <img src="/favicon-192.png" alt="" width={markSize} height={markSize} />
       </span>
       <span>{compact ? "Woven" : "Woven Stocks"}</span>
     </span>

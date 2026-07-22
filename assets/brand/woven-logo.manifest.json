@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "path": "scripts/render-brand-assets.mjs",
+    "sha256": "f34b4ce612086b96772f7bb2f8b1d33d7df5c35563ba41a43b10da636030430c"
+  },
+  "source": {
+    "path": "assets/brand/woven-logo-source.png",
+    "sha256": "5dbd6ee564e83f5929f2aa923f9d1c42ebbd123a868cdf11d37bab53d18731d8",
+    "width": 1254,
+    "height": 1254
+  },
+  "crop": {
+    "left": 217,
+    "top": 217,
+    "width": 820,
+    "height": 820
+  },
+  "outputs": [
+    {
+      "path": "public/favicon-32.png",
+      "sha256": "e6f1c19bf1c34b84f5bbd278a972e622a3618027ec62841bf64b31a3c3d8cd07",
+      "bytes": 1552,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "path": "public/favicon-192.png",
+      "sha256": "83c872aaa7abc0f23dc3b346ba57d4fb8ba9dc7369f661b2421d02eacf4e3639",
+      "bytes": 33202,
+      "width": 192,
+      "height": 192
+    },
+    {
+      "path": "public/favicon-512.png",
+      "sha256": "d4c99090745684f4587f0ffdbb5b7030dbf45d183082c7fc8bdc065f076325d4",
+      "bytes": 191338,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "path": "public/apple-touch-icon.png",
+      "sha256": "3e0c353a3f6f82131b48a4680bc58e9f2e60b05f52de3f766f9ec0749f0b1fe4",
+      "bytes": 29262,
+      "width": 180,
+      "height": 180
+    },
+    {
+      "path": "public/woven-token-logo.png",
+      "sha256": "c51b09d3f79b7719a395d2906629bb06403d61370a460e99ad9a0a57b09b7012",
+      "bytes": 495393,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "path": "assets/brand/woven-x-avatar-v2.png",
+      "sha256": "15b378638afb1d8e33afe656520434385006a59ed8fba2d0bd1fa83b65181bda",
+      "bytes": 126842,
+      "width": 400,
+      "height": 400
+    },
+    {
+      "path": "public/woven-social-preview.png",
+      "sha256": "46c057ad1362b5c78aa0c2cf0845380f5f8840e9f28c989a892f5b22c4f700f5",
+      "bytes": 273806,
+      "width": 1200,
+      "height": 630
+    }
+  ]
+}

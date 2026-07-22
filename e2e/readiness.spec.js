@@ -22,7 +22,7 @@ async function expectNoSeriousAccessibilityViolations(page) {
 test("landing page is responsive, original and accessible", async ({ page }) => {
   await page.goto("/")
 
-  await expect(page).toHaveTitle(/Woven Stocks/)
+  await expect(page).toHaveTitle("Woven")
   await expect(page.getByRole("heading", { name: "Built from many. Held as one." })).toBeVisible()
   await expect(page.locator(".hero__copy")).toHaveCSS("opacity", "1")
   await expect(page.locator(".hero img")).toHaveJSProperty("complete", true)
@@ -35,6 +35,21 @@ test("landing page is responsive, original and accessible", async ({ page }) => 
     "href",
     "https://github.com/wovenstocks/woven",
   )
+  const header = page.locator("header.site-header")
+  await expect(header.locator('a[aria-label="Woven on X"]')).toHaveAttribute(
+    "href",
+    "https://x.com/wovenstocks",
+  )
+  await expect(header.locator('a[aria-label="Woven on GitHub"]')).toHaveAttribute(
+    "href",
+    "https://github.com/wovenstocks/woven",
+  )
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    /\/woven-social-preview\.png$/,
+  )
+  await expect(page.getByText("Risk & eligibility", { exact: true })).toHaveCount(0)
+  await expect(page.getByRole("link", { name: "Licenses", exact: true })).toHaveCount(0)
   await expectNoHorizontalOverflow(page)
   await expectNoSeriousAccessibilityViolations(page)
 })
@@ -46,8 +61,17 @@ test("mobile navigation reaches every primary product area", async ({ page }, te
   await page.getByRole("button", { name: "Open menu" }).click()
   const navigation = page.getByRole("navigation", { name: "Mobile navigation" })
   await expect(navigation).toBeVisible()
+  await expect(navigation.getByRole("link", { name: "Woven on X" })).toHaveAttribute(
+    "href",
+    "https://x.com/wovenstocks",
+  )
+  await expect(navigation.getByRole("link", { name: "Woven on GitHub" })).toHaveAttribute(
+    "href",
+    "https://github.com/wovenstocks/woven",
+  )
   await navigation.getByRole("button", { name: "Explore baskets" }).click()
   await expect(page).toHaveURL(/#app$/)
+  await expect(page).toHaveTitle("Woven")
   await expect(page.getByRole("heading", { name: "Explore baskets" })).toBeVisible()
   await expectNoHorizontalOverflow(page)
 })
