@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "path": "scripts/generate-image-assets.mjs",
+    "sha256": "9e3e512d0b7b914cea9e8bf0b0dd21f2a2f0bee97ba7ea5c64b15fe70723b533"
+  },
+  "source": {
+    "path": "assets/source/woven-hero-folio.png",
+    "sha256": "eb9cc00234bd7f581861a4d0e2eb222a7b2c287e4eb10166001ee42e82943f3c"
+  },
+  "outputs": [
+    {
+      "path": "public/woven-hero-folio-720.jpg",
+      "sha256": "61e2d2ba90f3f0da04a63d774a962679a131fa9a4d2df865c8d908e0a953825f",
+      "bytes": 46523
+    },
+    {
+      "path": "public/woven-hero-folio-720.webp",
+      "sha256": "be2d85f44e5e3441f9b21d5f2d811a23a6a61a1c5c375d5b93f1a84dc8d0193a",
+      "bytes": 37060
+    },
+    {
+      "path": "public/woven-hero-folio-720.avif",
+      "sha256": "1c47970397c99d80dc6492633a0f3de8ef83ea675eacd7c8a7649e388ff1da32",
+      "bytes": 26255
+    },
+    {
+      "path": "public/woven-hero-folio-1280.jpg",
+      "sha256": "cd2f707cd19da26cadf6602b0704183b6566f54f814b7dd8bc156602a3a41a43",
+      "bytes": 146282
+    },
+    {
+      "path": "public/woven-hero-folio-1280.webp",
+      "sha256": "d4bb404e81037e9f3b0764178a755b38fa772484fa46abf17dfbd98d5e7ea4d8",
+      "bytes": 134606
+    },
+    {
+      "path": "public/woven-hero-folio-1280.avif",
+      "sha256": "4998799ddd09f93f97875b373f3c013a3509465804ac894821d9c17821528a64",
+      "bytes": 86453
+    },
+    {
+      "path": "public/woven-hero-folio-1586.jpg",
+      "sha256": "747f176152200d930d1d0f9eb7bb23d04436b9e5fbb60133d762b37831929cb7",
+      "bytes": 225943
+    },
+    {
+      "path": "public/woven-hero-folio-1586.webp",
+      "sha256": "c385bfef34a63a9f6a94c5e43005eaf956307fb6c7315eb488b8cfa6f650f4d0",
+      "bytes": 204720
+    },
+    {
+      "path": "public/woven-hero-folio-1586.avif",
+      "sha256": "82ce8186606f5af9017b17eb7ba782d43bc36469e7b466d953e7429bae63528b",
+      "bytes": 127325
+    },
+    {
+      "path": "public/social-card.jpg",
+      "sha256": "eda02c6befad80d9784e3b3b79f7ffc127f5d94c0ae2f6e9769ebff5634df28e",
+      "bytes": 127228
+    }
+  ]
+}

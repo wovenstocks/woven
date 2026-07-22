@@ -111,51 +111,54 @@ jobs:
         run: npm run contracts:test
 
       - name: Run Slither
+        working-directory: contracts
         run: |
-          mkdir -p security-output
-          slither contracts \
+          mkdir -p ../security-output
+          slither . \
             --exclude-dependencies \
             --exclude reentrancy-balance \
             --fail-high \
-            --json security-output/slither.json
+            --json ../security-output/slither.json
 
           # Slither flags balance-delta checks around external calls even though
           # every affected production entry point is nonReentrant. Preserve the
           # complete detector output for review without weakening other High gates.
-          slither contracts \
+          slither . \
             --exclude-dependencies \
             --detect reentrancy-balance \
             --fail-none \
-            --json security-output/slither-reentrancy-balance.json
+            --json ../security-output/slither-reentrancy-balance.json
 
       - name: Analyze deployment validation
+        working-directory: contracts
         run: |
-          slither contracts/script/DeployCore.s.sol \
+          slither script/DeployCore.s.sol \
             --compile-force-framework foundry \
             --exclude-dependencies \
             --exclude reentrancy-balance \
             --fail-high \
-            --json security-output/deploy-core.json
+            --json ../security-output/deploy-core.json
 
-          slither contracts/script/DeployBuyRouter.s.sol \
+          slither script/DeployBuyRouter.s.sol \
             --compile-force-framework foundry \
             --exclude-dependencies \
             --exclude reentrancy-balance \
             --fail-high \
-            --json security-output/deploy-buy-router.json
+            --json ../security-output/deploy-buy-router.json
 
-          slither contracts/script/DeployCoreFour.s.sol \
+          slither script/DeployCoreFour.s.sol \
             --compile-force-framework foundry \
             --exclude-dependencies \
             --exclude reentrancy-balance \
             --fail-high \
-            --json security-output/deploy-core-four.json
+            --json ../security-output/deploy-core-four.json
 
       - name: Check basket ERC-20 conformance
+        working-directory: contracts
         run: >-
-          slither-check-erc contracts BasketToken
+          slither-check-erc . BasketToken
           --erc ERC20
-          --json security-output/basket-token-erc20.json
+          --json ../security-output/basket-token-erc20.json
 
       - name: Create release evidence
         run: |
