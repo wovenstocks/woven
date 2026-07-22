@@ -348,6 +348,25 @@
       "status": "pending"
     },
     {
+      "id": "core-init-fee-splitter",
+      "phase": "core",
+      "required": true,
+      "signerRole": "deployment-signer",
+      "signingSurface": "foundry-external-signer",
+      "from": null,
+      "to": null,
+      "valueWei": "0",
+      "nonce": null,
+      "calldataKeccak256": null,
+      "decodedIntent": "FeeSplitter.initFactory(BasketFactory) with the reviewed core deployment",
+      "simulationEvidenceSha256": null,
+      "transactionHash": null,
+      "receipt": null,
+      "createdContracts": [],
+      "postconditionEvidenceSha256": null,
+      "status": "pending"
+    },
+    {
       "id": "safe-registry-admit-core4-assets",
       "phase": "registry",
       "required": true,

@@ -7,6 +7,7 @@ const DECIMAL_PATTERN = /^(?:0|[1-9][0-9]*)$/
 const METAMASK_DIRECT_SIGNING_SURFACES = new Set([
   "metamask-direct-transaction",
   "metamask-direct-transaction-or-foundry-external-signer",
+  "metamask-direct-from-foundry-simulation",
 ])
 
 const NETWORKS = Object.freeze({
@@ -43,9 +44,12 @@ const TRANSACTION_KEYS = Object.freeze([
   "signingSurface",
   "from",
   "to",
+  "nonce",
   "valueWei",
   "data",
+  "expectedCreatedContract",
   "description",
+  "simulationEvidenceSha256",
   "expiresAtUtc",
   "intentSha256",
 ])
@@ -142,8 +146,8 @@ function normalizeSource(value) {
   if (value.launchRecordSchema !== "woven-launch-signing-receipts/v1") {
     throw new Error("Manifest source must reference woven-launch-signing-receipts/v1.")
   }
-  if (value.preparedPlanSchema !== "woven-prepared-transaction-plan/v1") {
-    throw new Error("Manifest source must reference woven-prepared-transaction-plan/v1.")
+  if (value.preparedPlanSchema !== "woven-prepared-transaction-plan/v2") {
+    throw new Error("Manifest source must reference woven-prepared-transaction-plan/v2.")
   }
   return {
     launchRecordSchema: value.launchRecordSchema,
@@ -155,7 +159,7 @@ function normalizeSource(value) {
 
 export function transactionIntentPayload(manifest, transaction) {
   return {
-    schema: "woven-unsigned-transaction-intent/v1",
+    schema: "woven-unsigned-transaction-intent/v2",
     releaseId: manifest.releaseId,
     attemptId: manifest.attemptId,
     chainId: manifest.network.chainId,
@@ -164,9 +168,12 @@ export function transactionIntentPayload(manifest, transaction) {
     signingSurface: transaction.signingSurface,
     from: transaction.from,
     to: transaction.to,
+    nonce: transaction.nonce,
     valueWei: transaction.valueWei,
     data: transaction.data,
+    expectedCreatedContract: transaction.expectedCreatedContract,
     description: transaction.description,
+    simulationEvidenceSha256: transaction.simulationEvidenceSha256,
     expiresAtUtc: transaction.expiresAtUtc,
   }
 }
@@ -198,8 +205,8 @@ export async function sha256Json(value) {
 export async function normalizeAndVerifyManifest(value) {
   assertObject(value, "Manifest")
   assertExactKeys(value, TOP_LEVEL_KEYS, "Manifest")
-  if (value.schema !== "woven-unsigned-transactions/v1") {
-    throw new Error("Unsupported manifest schema; expected woven-unsigned-transactions/v1.")
+  if (value.schema !== "woven-unsigned-transactions/v2") {
+    throw new Error("Unsupported manifest schema; expected woven-unsigned-transactions/v2.")
   }
 
   const releaseId = normalizeIdentifier(value.releaseId, "Release ID")
@@ -244,9 +251,20 @@ export async function normalizeAndVerifyManifest(value) {
     }
     const from = normalizeAddress(transaction.from, `${label} sender`)
     const to = normalizeOptionalAddress(transaction.to, `${label} target`)
+    const nonce = normalizeDecimal(transaction.nonce, `${label} nonce`)
     const data = normalizeData(transaction.data, `${label} data`)
+    const expectedCreatedContract = normalizeOptionalAddress(
+      transaction.expectedCreatedContract,
+      `${label} expected created contract`,
+    )
     if (to === null && data === "0x") {
       throw new Error(`${label} contract creation requires non-empty bytecode.`)
+    }
+    if (to === null && expectedCreatedContract === null) {
+      throw new Error(`${label} contract creation requires its expected contract address.`)
+    }
+    if (to !== null && expectedCreatedContract !== null) {
+      throw new Error(`${label} call transaction cannot declare a created contract address.`)
     }
 
     let expiresAtUtc = null
@@ -259,6 +277,9 @@ export async function normalizeAndVerifyManifest(value) {
     if (id === "canary-mint-with-usdc" && expiresAtUtc === null) {
       throw new Error("The USDC canary transaction requires an explicit UTC expiry.")
     }
+    if (signingSurface === "metamask-direct-from-foundry-simulation" && expiresAtUtc === null) {
+      throw new Error("Foundry-derived MetaMask transactions require an explicit UTC expiry.")
+    }
 
     return {
       id,
@@ -266,9 +287,15 @@ export async function normalizeAndVerifyManifest(value) {
       signingSurface,
       from,
       to,
+      nonce,
       valueWei: normalizeDecimal(transaction.valueWei, `${label} valueWei`),
       data,
+      expectedCreatedContract,
       description: requiredString(transaction.description, `${label} description`, 2_000),
+      simulationEvidenceSha256: normalizeSha256(
+        transaction.simulationEvidenceSha256,
+        `${label} simulation evidence SHA-256`,
+      ),
       expiresAtUtc,
       intentSha256: normalizeSha256(transaction.intentSha256, `${label} intent SHA-256`),
     }
@@ -309,6 +336,18 @@ export function isTransactionExpired(transaction, now = Date.now()) {
   return transaction.expiresAtUtc !== null && Date.parse(transaction.expiresAtUtc) <= now
 }
 
+export function transactionSequenceFailure(transactions, receiptRecords, transactionId) {
+  const transactionIndex = transactions.findIndex(({ id }) => id === transactionId)
+  if (transactionIndex < 0) throw new Error("Transaction is absent from the active manifest.")
+  if (receiptRecords.has(transactionId)) return "Already submitted"
+  for (const prerequisite of transactions.slice(0, transactionIndex)) {
+    const record = receiptRecords.get(prerequisite.id)
+    if (!record) return "Previous step pending"
+    if (record.status !== "confirmed") return "Previous step failed"
+  }
+  return null
+}
+
 export function decimalToQuantity(valueWei) {
   const normalized = normalizeDecimal(valueWei, "valueWei")
   return `0x${BigInt(normalized).toString(16)}`
@@ -324,6 +363,7 @@ export function quantityToDecimal(value, label = "RPC quantity") {
 export function buildWalletTransaction(transaction) {
   const request = {
     from: transaction.from,
+    nonce: decimalToQuantity(transaction.nonce),
     value: decimalToQuantity(transaction.valueWei),
     data: transaction.data,
   }
@@ -349,6 +389,7 @@ export function verifyObservedTransaction(transaction, observed, expectedChainId
   const observedTo = nullableNormalizedAddress(observed.to, "Observed target")
   const observedData = normalizeData(observed.input ?? observed.data, "Observed data")
   const observedValueWei = quantityToDecimal(observed.value, "Observed value")
+  const observedNonce = quantityToDecimal(observed.nonce, "Observed nonce")
   const observedChainId = observed.chainId
     ? Number(quantityToDecimal(observed.chainId, "Observed chain ID"))
     : null
@@ -361,6 +402,7 @@ export function verifyObservedTransaction(transaction, observed, expectedChainId
   if (observedTo !== transaction.to) mismatches.push("target")
   if (observedData !== transaction.data) mismatches.push("data")
   if (observedValueWei !== transaction.valueWei) mismatches.push("value")
+  if (observedNonce !== transaction.nonce) mismatches.push("nonce")
   if (expectedChainId !== null && observedChainId !== null && observedChainId !== expectedChainId) {
     mismatches.push("chain-id")
   }
@@ -373,7 +415,7 @@ export function verifyObservedTransaction(transaction, observed, expectedChainId
       valueWei: observedValueWei,
       data: observedData,
       chainId: observedChainId,
-      nonce: observed.nonce ? quantityToDecimal(observed.nonce, "Observed nonce") : null,
+      nonce: observedNonce,
     },
   }
 }
@@ -401,8 +443,15 @@ export function createReceiptRecord({
   )
   const receiptFrom = normalizeAddress(receipt.from, "Receipt sender")
   const receiptTo = nullableNormalizedAddress(receipt.to, "Receipt target")
+  const receiptContractAddress = nullableNormalizedAddress(
+    receipt.contractAddress,
+    "Receipt contract address",
+  )
   const receiptStatus = quantityToDecimal(receipt.status, "Receipt status")
-  const receiptMatchesIntent = receiptFrom === transaction.from && receiptTo === transaction.to
+  const receiptMatchesIntent =
+    receiptFrom === transaction.from &&
+    receiptTo === transaction.to &&
+    receiptContractAddress === transaction.expectedCreatedContract
   const successful = receiptStatus === "1"
   const status =
     !observed.matches || !receiptMatchesIntent ? "mismatch" : successful ? "confirmed" : "reverted"
@@ -419,8 +468,11 @@ export function createReceiptRecord({
     intendedTransaction: {
       from: transaction.from,
       to: transaction.to,
+      nonce: transaction.nonce,
       valueWei: transaction.valueWei,
       data: transaction.data,
+      expectedCreatedContract: transaction.expectedCreatedContract,
+      simulationEvidenceSha256: transaction.simulationEvidenceSha256,
     },
     transactionHash: normalizedHash,
     explorerUrl: `${NETWORKS[manifest.network.chainId].explorerBaseUrl}/tx/${normalizedHash}`,
@@ -436,6 +488,9 @@ export function createReceiptRecord({
         ...observed.mismatches,
         ...(receiptFrom !== transaction.from ? ["receipt-sender"] : []),
         ...(receiptTo !== transaction.to ? ["receipt-target"] : []),
+        ...(receiptContractAddress !== transaction.expectedCreatedContract
+          ? ["receipt-contract-address"]
+          : []),
       ],
     },
     receipt: {
@@ -445,10 +500,7 @@ export function createReceiptRecord({
       status: Number(receiptStatus),
       from: receiptFrom,
       to: receiptTo,
-      contractAddress: nullableNormalizedAddress(
-        receipt.contractAddress,
-        "Receipt contract address",
-      ),
+      contractAddress: receiptContractAddress,
       gasUsed: quantityToDecimal(receipt.gasUsed, "Receipt gas used"),
     },
   }
@@ -468,8 +520,11 @@ export function createSubmittedRecord({ manifest, transaction, transactionHash, 
     intendedTransaction: {
       from: transaction.from,
       to: transaction.to,
+      nonce: transaction.nonce,
       valueWei: transaction.valueWei,
       data: transaction.data,
+      expectedCreatedContract: transaction.expectedCreatedContract,
+      simulationEvidenceSha256: transaction.simulationEvidenceSha256,
     },
     transactionHash: normalizedHash,
     explorerUrl: `${NETWORKS[manifest.network.chainId].explorerBaseUrl}/tx/${normalizedHash}`,

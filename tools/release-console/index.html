@@ -68,7 +68,7 @@
           <input id="manifest-file" type="file" accept="application/json,.json" />
         </div>
         <p class="supporting-copy">
-          Load only a <code>woven-unsigned-transactions/v1</code> manifest produced from the launch
+          Load only a <code>woven-unsigned-transactions/v2</code> manifest produced from the launch
           record and reviewed prepared plan. The incomplete launch template is never executable.
         </p>
         <div id="manifest-summary" class="manifest-summary" hidden></div>
@@ -111,7 +111,10 @@
         <dl id="review-fields" class="review-fields"></dl>
         <label class="confirmation-check">
           <input id="review-confirmation" type="checkbox" />
-          <span>I compared chain, sender, target, value, calldata and intent hash.</span>
+          <span
+            >I compared chain, sender, target, nonce, value, calldata, expected contract and intent
+            hash.</span
+          >
         </label>
         <p id="review-message" class="status-message" role="status" aria-live="assertive"></p>
         <div class="dialog-actions">

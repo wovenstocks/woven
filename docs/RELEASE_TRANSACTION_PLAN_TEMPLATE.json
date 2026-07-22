@@ -1,5 +1,5 @@
 {
-  "schema": "woven-prepared-transaction-plan/v1",
+  "schema": "woven-prepared-transaction-plan/v2",
   "releaseId": null,
   "attemptId": null,
   "network": {
@@ -11,8 +11,10 @@
       "id": "creator-approve-woven-license",
       "from": null,
       "to": null,
+      "nonce": null,
       "valueWei": "0",
       "data": null,
+      "expectedCreatedContract": null,
       "expiresAtUtc": null
     }
   ]

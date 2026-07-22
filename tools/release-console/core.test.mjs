@@ -7,6 +7,7 @@ import {
   manifestHashPayload,
   normalizeAndVerifyManifest,
   sha256Json,
+  transactionSequenceFailure,
   transactionIntentPayload,
   verifyObservedTransaction,
 } from "./core.mjs"
@@ -18,7 +19,7 @@ const BLOCK_HASH = `0x${"b".repeat(64)}`
 
 async function validManifest(overrides = {}) {
   const manifest = {
-    schema: "woven-unsigned-transactions/v1",
+    schema: "woven-unsigned-transactions/v2",
     releaseId: "woven-2026-07-22",
     attemptId: "attempt-001",
     generatedAtUtc: "2026-07-22T12:00:00.000Z",
@@ -26,7 +27,7 @@ async function validManifest(overrides = {}) {
     source: {
       launchRecordSchema: "woven-launch-signing-receipts/v1",
       launchRecordSha256: `sha256:${"1".repeat(64)}`,
-      preparedPlanSchema: "woven-prepared-transaction-plan/v1",
+      preparedPlanSchema: "woven-prepared-transaction-plan/v2",
       preparedPlanSha256: `sha256:${"2".repeat(64)}`,
     },
     transactions: [
@@ -36,9 +37,12 @@ async function validManifest(overrides = {}) {
         signingSurface: "metamask-direct-transaction",
         from: FROM,
         to: TO,
+        nonce: "7",
         valueWei: "0",
         data: "0x1234",
+        expectedCreatedContract: null,
         description: "Approve the reviewed creator-license amount",
+        simulationEvidenceSha256: `sha256:${"3".repeat(64)}`,
         expiresAtUtc: null,
         intentSha256: `sha256:${"0".repeat(64)}`,
       },
@@ -124,11 +128,34 @@ describe("release-console manifest validation", () => {
 })
 
 describe("release-console transaction and receipt records", () => {
+  it("enforces manifest order and stops after any earlier failed receipt", () => {
+    const transactions = [{ id: "first" }, { id: "second" }]
+    expect(transactionSequenceFailure(transactions, new Map(), "first")).toBeNull()
+    expect(transactionSequenceFailure(transactions, new Map(), "second")).toBe(
+      "Previous step pending",
+    )
+    expect(
+      transactionSequenceFailure(
+        transactions,
+        new Map([["first", { status: "reverted" }]]),
+        "second",
+      ),
+    ).toBe("Previous step failed")
+    expect(
+      transactionSequenceFailure(
+        transactions,
+        new Map([["first", { status: "confirmed" }]]),
+        "second",
+      ),
+    ).toBeNull()
+  })
+
   it("builds only the reviewed wallet transaction fields", async () => {
     const manifest = await normalizeAndVerifyManifest(await validManifest())
     expect(buildWalletTransaction(manifest.transactions[0])).toEqual({
       from: FROM,
       to: TO,
+      nonce: "0x7",
       value: "0x0",
       data: "0x1234",
     })
@@ -243,5 +270,70 @@ describe("release-console transaction and receipt records", () => {
     })
     expect(record.status).toBe("mismatch")
     expect(record.validation.mismatches).toContain("target")
+  })
+
+  it("binds Foundry-derived contract creation to nonce, expiry and expected address", async () => {
+    const manifest = await validManifest()
+    manifest.transactions[0] = {
+      ...manifest.transactions[0],
+      id: "core-deploy-creator-license",
+      sourceTransactionId: "core-deploy-creator-license",
+      signingSurface: "metamask-direct-from-foundry-simulation",
+      to: null,
+      expectedCreatedContract: TO,
+      expiresAtUtc: "2026-07-22T14:00:00.000Z",
+    }
+    manifest.transactions[0].intentSha256 = await sha256Json(
+      transactionIntentPayload(manifest, manifest.transactions[0]),
+    )
+    manifest.manifestSha256 = await sha256Json(manifestHashPayload(manifest))
+    const normalized = await normalizeAndVerifyManifest(manifest)
+    expect(buildWalletTransaction(normalized.transactions[0])).toEqual({
+      from: FROM,
+      nonce: "0x7",
+      value: "0x0",
+      data: "0x1234",
+    })
+  })
+
+  it("marks an unexpected nonce or created contract address as a mismatch", async () => {
+    const manifest = await validManifest()
+    manifest.transactions[0].expectedCreatedContract = TO
+    manifest.transactions[0].to = null
+    manifest.transactions[0].intentSha256 = await sha256Json(
+      transactionIntentPayload(manifest, manifest.transactions[0]),
+    )
+    manifest.manifestSha256 = await sha256Json(manifestHashPayload(manifest))
+    const normalized = await normalizeAndVerifyManifest(manifest)
+    const record = createReceiptRecord({
+      manifest: normalized,
+      transaction: normalized.transactions[0],
+      transactionHash: TX_HASH,
+      submittedAtUtc: "2026-07-22T12:01:00.000Z",
+      confirmedAtUtc: "2026-07-22T12:02:00.000Z",
+      confirmationsObserved: 2,
+      observedTransaction: {
+        from: FROM,
+        to: null,
+        value: "0x0",
+        input: "0x1234",
+        chainId: "0x38",
+        nonce: "0x8",
+      },
+      receipt: {
+        transactionHash: TX_HASH,
+        blockNumber: "0x64",
+        blockHash: BLOCK_HASH,
+        status: "0x1",
+        from: FROM,
+        to: null,
+        contractAddress: "0x3333333333333333333333333333333333333333",
+        gasUsed: "0x5208",
+      },
+    })
+    expect(record.status).toBe("mismatch")
+    expect(record.validation.mismatches).toEqual(
+      expect.arrayContaining(["nonce", "receipt-contract-address"]),
+    )
   })
 })

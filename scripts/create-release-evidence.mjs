@@ -48,6 +48,7 @@ export const RELEASE_TOOLING = Object.freeze([
   "tools/release-console/app.mjs",
   "tools/release-console/core.mjs",
   "tools/release-console/index.html",
+  "tools/release-console/prepare-foundry-plan.mjs",
   "tools/release-console/prepare-manifest.mjs",
   "tools/release-console/server.mjs",
   "tools/release-console/styles.css",

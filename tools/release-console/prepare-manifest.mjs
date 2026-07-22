@@ -14,10 +14,20 @@ import {
 const ALLOWED_SIGNING_SURFACES = new Set([
   "metamask-direct-transaction-or-foundry-external-signer",
   "metamask-direct-transaction",
+  "metamask-direct-from-foundry-simulation",
 ])
 const PLAN_KEYS = ["schema", "releaseId", "attemptId", "network", "transactions"]
 const PLAN_NETWORK_KEYS = ["name", "chainId"]
-const PLAN_TRANSACTION_KEYS = ["id", "from", "to", "valueWei", "data", "expiresAtUtc"]
+const PLAN_TRANSACTION_KEYS = [
+  "id",
+  "from",
+  "to",
+  "nonce",
+  "valueWei",
+  "data",
+  "expectedCreatedContract",
+  "expiresAtUtc",
+]
 
 function assertObject(value, label) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -76,8 +86,8 @@ function parseArguments(arguments_) {
 function normalizePlan(plan) {
   assertObject(plan, "Prepared transaction plan")
   assertExactKeys(plan, PLAN_KEYS, "Prepared transaction plan")
-  if (plan.schema !== "woven-prepared-transaction-plan/v1") {
-    throw new Error("Prepared transaction plan schema must be woven-prepared-transaction-plan/v1.")
+  if (plan.schema !== "woven-prepared-transaction-plan/v2") {
+    throw new Error("Prepared transaction plan schema must be woven-prepared-transaction-plan/v2.")
   }
   assertObject(plan.network, "Prepared transaction plan network")
   assertExactKeys(plan.network, PLAN_NETWORK_KEYS, "Prepared transaction plan network")
@@ -96,6 +106,9 @@ function normalizePlan(plan) {
     if (typeof transaction.data !== "string" || !/^0x(?:[0-9a-fA-F]{2})+$/.test(transaction.data)) {
       throw new Error(`${label} data must be non-empty, even-length 0x-prefixed bytes.`)
     }
+    if (typeof transaction.nonce !== "string" || !/^(?:0|[1-9][0-9]*)$/.test(transaction.nonce)) {
+      throw new Error(`${label} nonce must be a canonical decimal string.`)
+    }
     if (
       typeof transaction.valueWei !== "string" ||
       !/^(?:0|[1-9][0-9]*)$/.test(transaction.valueWei)
@@ -105,6 +118,12 @@ function normalizePlan(plan) {
     if (transaction.to !== null && typeof transaction.to !== "string") {
       throw new Error(`${label} target must be an address or null for contract creation.`)
     }
+    if (
+      transaction.expectedCreatedContract !== null &&
+      typeof transaction.expectedCreatedContract !== "string"
+    ) {
+      throw new Error(`${label} expected created contract must be an address or null.`)
+    }
     if (transaction.expiresAtUtc !== null && typeof transaction.expiresAtUtc !== "string") {
       throw new Error(`${label} expiresAtUtc must be a UTC timestamp or null.`)
     }
@@ -112,8 +131,16 @@ function normalizePlan(plan) {
       id,
       from: normalizeAddress(transaction.from, `${label} sender`),
       to: transaction.to === null ? null : normalizeAddress(transaction.to, `${label} target`),
+      nonce: transaction.nonce,
       valueWei: transaction.valueWei,
       data: transaction.data.toLowerCase(),
+      expectedCreatedContract:
+        transaction.expectedCreatedContract === null
+          ? null
+          : normalizeAddress(
+              transaction.expectedCreatedContract,
+              `${label} expected created contract`,
+            ),
       expiresAtUtc: transaction.expiresAtUtc,
     }
   })
@@ -170,7 +197,7 @@ export async function prepareManifest({ launchRecordText, preparedPlanText, now 
     launchTransactions.set(transaction.id, transaction)
   }
   const manifest = {
-    schema: "woven-unsigned-transactions/v1",
+    schema: "woven-unsigned-transactions/v2",
     releaseId: plan.releaseId,
     attemptId: plan.attemptId,
     generatedAtUtc: now.toISOString(),
@@ -212,6 +239,9 @@ export async function prepareManifest({ launchRecordText, preparedPlanText, now 
     if (source.valueWei !== null && source.valueWei !== prepared.valueWei) {
       throw new Error(`Prepared value does not match the launch record for ${prepared.id}.`)
     }
+    if (source.nonce !== null && source.nonce !== prepared.nonce) {
+      throw new Error(`Prepared nonce does not match the launch record for ${prepared.id}.`)
+    }
     if (typeof source.calldataKeccak256 !== "string") {
       throw new Error(`Launch record calldata hash must be recorded for ${prepared.id}.`)
     }
@@ -220,15 +250,40 @@ export async function prepareManifest({ launchRecordText, preparedPlanText, now 
     }
     requireHash(source.simulationEvidenceSha256, `${prepared.id} simulation evidence SHA-256`)
 
+    const recordedCreatedContracts = Array.isArray(source.createdContracts)
+      ? source.createdContracts.filter((contract) => contract?.address)
+      : []
+    if (prepared.expectedCreatedContract !== null) {
+      if (recordedCreatedContracts.length !== 1) {
+        throw new Error(
+          `Launch record must contain exactly one created contract address for ${prepared.id}.`,
+        )
+      }
+      if (
+        normalizeAddress(recordedCreatedContracts[0].address) !== prepared.expectedCreatedContract
+      ) {
+        throw new Error(
+          `Expected created contract does not match the launch record for ${prepared.id}.`,
+        )
+      }
+    } else if (recordedCreatedContracts.length > 0) {
+      throw new Error(`Call transaction ${prepared.id} cannot claim a receipt-created contract.`)
+    }
+
     const transaction = {
       id: prepared.id,
       sourceTransactionId: prepared.id,
       signingSurface: source.signingSurface,
       from: prepared.from,
       to: prepared.to,
+      nonce: prepared.nonce,
       valueWei: prepared.valueWei,
       data: prepared.data,
+      expectedCreatedContract: prepared.expectedCreatedContract,
       description: source.decodedIntent,
+      simulationEvidenceSha256: source.simulationEvidenceSha256.startsWith("sha256:")
+        ? source.simulationEvidenceSha256
+        : `sha256:${source.simulationEvidenceSha256}`,
       expiresAtUtc: prepared.expiresAtUtc,
       intentSha256: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     }

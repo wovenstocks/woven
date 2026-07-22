@@ -135,8 +135,9 @@ separate requirements.
 
 ### Reproducible contract command
 
-Create a named Foundry keystore for the deployment signer outside this
-repository. It must not contain a raw private key in this repository. Export
+Use either a named Foundry keystore or reviewed hardware signer outside this
+repository, or the repository's nonce-bound Foundry-to-MetaMask plan generator.
+Never export a MetaMask seed or private key merely to make the CLI sign. Export
 only the public deployment inputs into the current shell, then run the first
 command below. It is deliberately a simulation: it contains no account option,
 `--broadcast`, or `--slow`.
@@ -159,7 +160,7 @@ forge script script/DeployCore.s.sol:DeployCore \
 
 Only after the simulation, inputs, predicted transactions, and release record
 have been approved, submit the separate state-changing command with the external
-keystore signer:
+signer:
 
 ```bash
 forge script script/DeployCore.s.sol:DeployCore \
@@ -169,6 +170,15 @@ forge script script/DeployCore.s.sol:DeployCore \
   --broadcast \
   --slow
 ```
+
+If the reviewed owner uses MetaMask instead, do not translate the trace by
+hand. Run `npm run release:console:prepare-foundry` from the repository root
+with the dry-run `run-latest.json`, full Git commit, explicit phase, and an
+expiry no more than 24 hours ahead. The generated v2 plan binds every input,
+contiguous nonce and predicted CREATE address. The localhost console rechecks
+the pending nonce before every separate MetaMask prompt and blocks later rows
+until the prior receipt is confirmed. The exact command is documented in the
+[launch operator runbook](LAUNCH_OPERATOR_RUNBOOK.md#local-metamask-release-console).
 
 For mainnet, use a separately reviewed keystore and address set and change only
 the selected record to chain ID `56`, and set `WOVEN_BNB_RPC_URL` to a reviewed
