@@ -39,12 +39,13 @@ There is no safe blanket signature that lets an operator finish the launch
 later. Each onchain transaction has its own nonce, calldata, gas conditions,
 and receipt.
 
-| Surface               | Use                                                                                                          | Boundary                                                                                                                                                                                                                                 |
-| --------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MetaMask owner wallet | Review and sign explicit direct-wallet transactions and the owner signature for an explicit Safe transaction | Never share or export the seed phrase or private key. A connection approval is not transaction authorization.                                                                                                                            |
-| Safe transaction flow | Execute protocol-admin calls from the pinned Safe, such as registry admission                                | Record the Safe nonce, Safe transaction hash, decoded target/value/operation/calldata, executor transaction, and receipt. An owner signature alone is not execution proof.                                                               |
-| Foundry simulation    | Reproduce deployment validation and predicted transactions without changing chain state                      | Run without `--broadcast` and without an account option. A passing simulation is not a receipt.                                                                                                                                          |
-| Foundry broadcast     | Submit the reviewed deployment scripts                                                                       | Foundry needs a supported external signer such as a named encrypted keystore or reviewed hardware-wallet flow. The MetaMask browser extension is not a Foundry signer. Do not export a MetaMask private key merely to make the CLI work. |
+| Surface                       | Use                                                                                                          | Boundary                                                                                                                                                                                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MetaMask owner wallet         | Review and sign explicit direct-wallet transactions and the owner signature for an explicit Safe transaction | Never share or export the seed phrase or private key. A connection approval is not transaction authorization.                                                                                                                                     |
+| Safe transaction flow         | Execute protocol-admin calls from the pinned Safe, such as registry admission                                | Record the Safe nonce, Safe transaction hash, decoded target/value/operation/calldata, executor transaction, and receipt. An owner signature alone is not execution proof.                                                                        |
+| Foundry simulation            | Reproduce deployment validation and predicted transactions without changing chain state                      | Run without `--broadcast` and without an account option. A passing simulation is not a receipt.                                                                                                                                                   |
+| Foundry broadcast             | Submit the reviewed deployment scripts                                                                       | Foundry needs a supported external signer such as a named encrypted keystore or reviewed hardware-wallet flow. The MetaMask browser extension is not a Foundry CLI signer. Do not export a MetaMask private key merely to make the CLI work.      |
+| Foundry-derived MetaMask plan | Submit the exact transactions emitted by a reviewed Foundry dry-run through the localhost console            | The repository generator must bind the dry-run file hash, Git commit, sender, contiguous nonces, calldata, predicted CREATE addresses, order, and a maximum 24-hour expiry. Every transaction still receives its own MetaMask prompt and receipt. |
 
 One public EOA may fill the owner, deployment-signer, creator, and canary-payer
 roles if the release owner deliberately chooses and funds that profile. Record
@@ -53,12 +54,12 @@ remove any review, signature, or receipt requirement.
 
 One local keystore unlock may let Foundry sign a reviewed script run, but every
 broadcast remains a separate chain transaction and needs a separate receipt.
-The repository's localhost release console handles only already encoded entries
-whose launch-record signing surface is `metamask-direct-transaction` or
-`metamask-direct-transaction-or-foundry-external-signer`. It deliberately
-rejects Foundry-only deployments, Safe owner-signature entries, Four.meme flows,
-and external events. Do not manually translate a Foundry simulation or expose a
-wallet secret merely to force those transactions through MetaMask.
+The repository's localhost release console handles already encoded direct
+transactions and automatically generated
+`metamask-direct-from-foundry-simulation` entries. It continues to reject raw
+Foundry-only entries, Safe owner-signature entries, Four.meme flows, and
+external events. Never hand-copy a Foundry trace into a wallet plan: use the
+generator below, or use a supported external Foundry signer.
 
 ## Local MetaMask release console
 
@@ -71,13 +72,35 @@ injected MetaMask provider. Closing the local process disables it.
 1. Copy the launch template into the untracked `release-evidence/` directory.
    Fill its final `releaseId`, `attemptId`, public addresses, simulation hashes,
    calldata hashes and status fields. Preserve the original attempt record.
-2. Copy
+2. For a Foundry deployment phase, generate both the updated launch record and
+   nonce-bound transaction plan directly from the dry-run broadcast file. Use a
+   fresh expiry no more than 24 hours ahead and the full reviewed commit:
+
+   ```bash
+   npm run release:console:prepare-foundry -- \
+     --launch-record release-evidence/launch-attempt.json \
+     --broadcast contracts/broadcast/DeployCore.s.sol/56/dry-run/run-latest.json \
+     --phase core \
+     --release-id woven-mainnet-YYYY-MM-DD \
+     --attempt-id attempt-001 \
+     --expires-at YYYY-MM-DDTHH:MM:SS.000Z \
+     --expected-commit 40_CHARACTER_GIT_COMMIT \
+     --record-output release-evidence/core-launch-record.json \
+     --plan-output release-evidence/core-transaction-plan.json
+   ```
+
+   The command fails if the script operation order, chain, commit, sender,
+   nonce sequence, CREATE address, core wiring, or evidence hash differs from
+   the reviewed profile. Use `--phase router` or `--phase core4` only with the
+   corresponding dry-run artifact.
+
+3. For a non-Foundry direct call, copy
    [`RELEASE_TRANSACTION_PLAN_TEMPLATE.json`](RELEASE_TRANSACTION_PLAN_TEMPLATE.json)
    into `release-evidence/`. Include only direct-MetaMask entries. Populate each
-   exact sender, target, decimal wei value, calldata and UTC expiry when the
-   calldata contains a deadline. Derive calldata from the reviewed encoder or
-   simulation; never hand-type it.
-3. Generate a versioned hash-bound manifest. The command refuses an existing
+   exact sender, target, nonce, decimal wei value, calldata, expected receipt
+   contract address, and UTC expiry when required. Derive calldata from the
+   reviewed encoder; never hand-type it.
+4. Generate a versioned hash-bound manifest. The command refuses an existing
    output file so an earlier attempt is not overwritten:
 
    ```bash
@@ -87,17 +110,19 @@ injected MetaMask provider. Closing the local process disables it.
      --output release-evidence/unsigned-transactions.json
    ```
 
-4. Independently compare both SHA-256 source hashes and every decoded field,
+5. Independently compare both SHA-256 source hashes and every decoded field,
    then start `npm run release:console`. Open only the printed
    `http://127.0.0.1:<port>` URL in the browser profile containing MetaMask.
-5. Load the generated manifest, connect the exact sender, match chain 56, review
+6. Load the generated manifest, connect the exact sender, match chain 56, review
    one row, tick the explicit comparison checkbox and click **Send this
    transaction**. MetaMask then provides the separate wallet confirmation.
-6. After submission, do not retry on a timeout. Use **Check receipt**. The tool
-   reads the transaction back, compares sender, target, value and calldata,
-   requires two observed confirmations, and records confirmed, reverted or
-   mismatch status. Export the JSON receipt bundle and attach it to the launch
-   attempt evidence.
+7. Before each prompt the console re-reads the wallet's pending nonce and stops
+   unless it exactly matches the manifest. After submission, do not retry on a
+   timeout. Use **Check receipt**. The tool reads the transaction back, compares
+   sender, target, nonce, value, calldata and expected CREATE address, requires
+   two observed confirmations, and records confirmed, reverted or mismatch
+   status. Later rows remain blocked until every earlier receipt is confirmed.
+   Export the JSON receipt bundle and attach it to the launch attempt evidence.
 
 The incomplete launch template and transaction-plan template are intentionally
 not executable. The console cannot approve future transactions, bypass a
@@ -187,8 +212,8 @@ forge script script/DeployCore.s.sol:DeployCore \
   --sender 0xREPLACE_WITH_PUBLIC_DEPLOYER
 ```
 
-After independent comparison of the simulation and manifest, broadcast with a
-reviewed Foundry signer:
+After independent comparison of the simulation and manifest, either broadcast
+with a reviewed Foundry signer:
 
 ```bash
 forge script script/DeployCore.s.sol:DeployCore \
@@ -199,6 +224,11 @@ forge script script/DeployCore.s.sol:DeployCore \
   --slow
 ```
 
+or generate the nonce-bound `core` MetaMask plan from the same dry-run artifact
+with `npm run release:console:prepare-foundry`. Do not use both submission paths
+for one attempt. Re-read the sender's pending nonce immediately before choosing
+the path.
+
 Record one successful receipt and created address for each contract:
 
 - `CreatorLicense`;
@@ -206,6 +236,7 @@ Record one successful receipt and created address for each contract:
 - `FeeSplitter`;
 - `CuratorGuardian`;
 - `BasketFactory`.
+- `FeeSplitter.initFactory(BasketFactory)` as the sixth core transaction.
 
 For each output, record constructor arguments, runtime code hash, verified source
 URL, and immutable/read-back wiring. Preserve the Foundry broadcast artifact,

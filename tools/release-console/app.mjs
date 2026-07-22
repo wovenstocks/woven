@@ -7,6 +7,8 @@ import {
   normalizeAddress,
   normalizeAndVerifyManifest,
   normalizeTransactionHash,
+  quantityToDecimal,
+  transactionSequenceFailure,
 } from "./core.mjs"
 
 const RECEIPT_TIMEOUT_MS = 10 * 60 * 1_000
@@ -170,8 +172,7 @@ function gateFailure(transaction, { allowRequestInProgress = false } = {}) {
   if (account !== transaction.from) return "Wrong account"
   if (isTransactionExpired(transaction)) return "Expired"
   if (requestInProgress && !allowRequestInProgress) return "Request in progress"
-  if (receiptRecords.has(transaction.id)) return "Already submitted"
-  return null
+  return transactionSequenceFailure(manifest.transactions, receiptRecords, transaction.id)
 }
 
 function renderSession() {
@@ -244,8 +245,11 @@ function renderTransaction(transaction) {
   appendDefinition(fields, "Chain ID", String(manifest.network.chainId))
   appendDefinition(fields, "From", transaction.from, true)
   appendDefinition(fields, "To", transaction.to ?? "Contract creation", true)
+  appendDefinition(fields, "Nonce", transaction.nonce, true)
   appendDefinition(fields, "Value (wei)", transaction.valueWei, true)
+  appendDefinition(fields, "Expected contract", transaction.expectedCreatedContract ?? "None", true)
   appendDefinition(fields, "Intent hash", transaction.intentSha256, true)
+  appendDefinition(fields, "Simulation hash", transaction.simulationEvidenceSha256, true)
   appendDefinition(fields, "Signing surface", transaction.signingSurface)
   appendDefinition(fields, "Expires", transaction.expiresAtUtc ?? "No manifest expiry")
 
@@ -394,9 +398,22 @@ function openReview(transaction) {
   appendDefinition(elements.reviewFields, "Chain ID", String(manifest.network.chainId))
   appendDefinition(elements.reviewFields, "From", transaction.from, true)
   appendDefinition(elements.reviewFields, "To", transaction.to ?? "Contract creation", true)
+  appendDefinition(elements.reviewFields, "Nonce", transaction.nonce, true)
   appendDefinition(elements.reviewFields, "Value (wei)", transaction.valueWei, true)
+  appendDefinition(
+    elements.reviewFields,
+    "Expected contract",
+    transaction.expectedCreatedContract ?? "None",
+    true,
+  )
   appendDefinition(elements.reviewFields, "Calldata", transaction.data, true)
   appendDefinition(elements.reviewFields, "Intent hash", transaction.intentSha256, true)
+  appendDefinition(
+    elements.reviewFields,
+    "Simulation hash",
+    transaction.simulationEvidenceSha256,
+    true,
+  )
   appendDefinition(elements.reviewFields, "Manifest hash", manifest.manifestSha256, true)
   appendDefinition(
     elements.reviewFields,
@@ -413,6 +430,18 @@ async function ensureCurrentSigningGates(transaction) {
   await refreshWalletState()
   const failure = gateFailure(transaction, { allowRequestInProgress: true })
   if (failure) throw new Error(`Signing gate failed: ${failure}.`)
+  const pendingNonce = quantityToDecimal(
+    await provider.request({
+      method: "eth_getTransactionCount",
+      params: [transaction.from, "pending"],
+    }),
+    "Pending wallet nonce",
+  )
+  if (pendingNonce !== transaction.nonce) {
+    throw new Error(
+      `Signing gate failed: pending wallet nonce is ${pendingNonce}, manifest requires ${transaction.nonce}. Re-simulate; do not override the nonce.`,
+    )
+  }
 }
 
 function replaceRecord(record) {

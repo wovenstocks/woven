@@ -18,10 +18,12 @@ function launchRecord(signingSurface = "metamask-direct-transaction") {
         signingSurface,
         from: FROM,
         to: TO,
+        nonce: "7",
         valueWei: "0",
         calldataKeccak256: keccak256("0x1234"),
         decodedIntent: "Approve the reviewed creator-license amount",
         simulationEvidenceSha256: EVIDENCE_HASH,
+        createdContracts: [],
         status: "pending",
       },
     ],
@@ -30,7 +32,7 @@ function launchRecord(signingSurface = "metamask-direct-transaction") {
 
 function preparedPlan() {
   return {
-    schema: "woven-prepared-transaction-plan/v1",
+    schema: "woven-prepared-transaction-plan/v2",
     releaseId: "woven-2026-07-22",
     attemptId: "attempt-001",
     network: { name: "bnb-smart-chain-mainnet", chainId: 56 },
@@ -39,8 +41,10 @@ function preparedPlan() {
         id: "creator-approve-woven-license",
         from: FROM,
         to: TO,
+        nonce: "7",
         valueWei: "0",
         data: "0x1234",
+        expectedCreatedContract: null,
         expiresAtUtc: null,
       },
     ],
@@ -55,7 +59,7 @@ describe("release-console manifest preparation", () => {
       now: new Date("2026-07-22T12:00:00.000Z"),
     })
     expect(manifest).toMatchObject({
-      schema: "woven-unsigned-transactions/v1",
+      schema: "woven-unsigned-transactions/v2",
       releaseId: "woven-2026-07-22",
       attemptId: "attempt-001",
       network: { chainId: 56 },
@@ -64,8 +68,10 @@ describe("release-console manifest preparation", () => {
       id: "creator-approve-woven-license",
       from: FROM,
       to: TO,
+      nonce: "7",
       data: "0x1234",
       description: "Approve the reviewed creator-license amount",
+      simulationEvidenceSha256: `sha256:${EVIDENCE_HASH}`,
     })
     expect(manifest.manifestSha256).toMatch(/^sha256:[0-9a-f]{64}$/)
   })
@@ -83,6 +89,21 @@ describe("release-console manifest preparation", () => {
         }),
       ).rejects.toThrow("unsupported signing surface")
     }
+  })
+
+  it("accepts an expiring nonce-bound Foundry-derived MetaMask transaction", async () => {
+    const record = launchRecord("metamask-direct-from-foundry-simulation")
+    const plan = preparedPlan()
+    plan.transactions[0].expiresAtUtc = "2026-07-22T14:00:00.000Z"
+    const manifest = await prepareManifest({
+      launchRecordText: JSON.stringify(record),
+      preparedPlanText: JSON.stringify(plan),
+      now: new Date("2026-07-22T12:00:00.000Z"),
+    })
+    expect(manifest.transactions[0]).toMatchObject({
+      nonce: "7",
+      signingSurface: "metamask-direct-from-foundry-simulation",
+    })
   })
 
   it("rejects confirmed entries and sender mismatches", async () => {
@@ -103,6 +124,15 @@ describe("release-console manifest preparation", () => {
         preparedPlanText: JSON.stringify(mismatched),
       }),
     ).rejects.toThrow("sender does not match")
+
+    const nonceMismatched = preparedPlan()
+    nonceMismatched.transactions[0].nonce = "8"
+    await expect(
+      prepareManifest({
+        launchRecordText: JSON.stringify(launchRecord()),
+        preparedPlanText: JSON.stringify(nonceMismatched),
+      }),
+    ).rejects.toThrow("nonce does not match")
   })
 
   it("requires a recorded simulation evidence hash", async () => {

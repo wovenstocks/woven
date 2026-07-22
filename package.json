@@ -29,6 +29,7 @@
     "release:evidence": "node scripts/create-release-evidence.mjs",
     "release:console": "node tools/release-console/server.mjs",
     "release:console:prepare": "node tools/release-console/prepare-manifest.mjs",
+    "release:console:prepare-foundry": "node tools/release-console/prepare-foundry-plan.mjs",
     "safe:prepare": "node scripts/prepare-safe.mjs",
     "launch:verify": "node scripts/verify-launch-profile.mjs",
     "bstocks:verify": "node scripts/verify-bstocks.mjs",
